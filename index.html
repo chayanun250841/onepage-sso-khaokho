@@ -500,7 +500,7 @@ textarea{line-height:1.65}
       </div>
       <div class="field"><div class="fl">วันที่ <span class="req">จำเป็น</span></div><input type="date" id="f-date" oninput="ua();as()"></div>
       <div class="field"><div class="fl">หัวข้อกิจกรรม <span class="req">จำเป็น</span></div><input type="text" id="f-title" placeholder="เช่น ประชุม ชี้แจงการดำเนินงาน..." oninput="ua();as()"></div>
-      <div class="field" id="fld-as" style="display:none"><div class="fl">ผู้รับมอบหมาย <span class="opt">ใช้ template</span></div><input type="text" id="f-assignee" placeholder="นายปิยะณัฐ ทองโกย นักวิชาการสาธารณสุขปฏิบัติการ" oninput="as()"></div>
+      <div class="field" id="fld-as" style="display:none"><div class="fl">ผู้รับมอบหมาย <span class="opt">ใช้ template</span></div><input type="text" id="f-assignee" placeholder="นายชยานันต์ จันทร์คำ  นักวิชาการสาธารณสุข" oninput="as()"></div>
       <div class="field"><div class="fl">สถานที่จัด <span class="opt">ใช้ template</span></div><input type="text" id="f-venue" placeholder="ห้องประชุมพ่อขุนผาเมือง สสจ.พช." oninput="as()"></div>
 
       <div id="tmpl-a" class="tmpl"><strong>สูตร A:</strong> <span class="sl">วันที่</span> นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ <span class="sl">ได้ดำเนินการจัด</span> <span class="sl">กิจกรรม</span> เพื่อ<span class="sl">วัตถุประสงค์</span> ณ <span class="sl">สถานที่</span></div>
@@ -1127,7 +1127,7 @@ function renderFooterLogosPreview(){
 function fillTpl(){
   const ds=v('f-date')?dfull(v('f-date')):'[วัน เดือน ปีพ.ศ.]';
   const ti=v('f-title')||'[ชื่อกิจกรรม]';const vn=v('f-venue')||'[สถานที่]';
-  const as2=v('f-assignee')||'นายปิยะณัฐ ทองโกย นักวิชาการสาธารณสุขปฏิบัติการ';
+  const as2=v('f-assignee')||'นายชยานันต์ จันทร์คำ  นักวิชาการสาธารณสุข';
   const txt=cType==='A'
     ?`${ds} นางกานพ์ดารัตน์ พลับพลา สาธารณสุขอำเภอเขาค้อ ได้ดำเนินการจัด${ti} อำเภอเขาค้อ จังหวัดเพชรบูรณ์\n\nเพื่อ[ระบุวัตถุประสงค์] โดยมี[ระบุผู้เข้าร่วม] เข้าร่วม ณ ${vn}\n\nผลการดำเนินงาน [ระบุผล]`
     :`${ds} นางกานพ์ดารัตน์ พลับพลา สาธารณสุขอำเภอเขาค้อ มอบหมายให้ ${as2} เจ้าหน้าที่ผู้รับผิดชอบงาน เข้าร่วม${ti} ณ ${vn}\n\nเพื่อ[ระบุวัตถุประสงค์]\n\nผลการดำเนินงาน [ระบุผล]`;
@@ -1137,25 +1137,41 @@ function fillTpl(){
 
 // ════ AI BODY ════
 async function genAI(){
-  const ti=v('f-title');if(!ti){toast('❌ กรุณาใส่หัวข้อก่อน');return;}
-  const btn=document.getElementById('ai-btn'),spin=document.getElementById('ai-spin');
-  btn.disabled=true;spin.classList.add('show');
-  const ds=v('f-date')?dfull(v('f-date')):'';const vn=v('f-venue');
-  const as2=v('f-assignee')||'นายปิยะณัฐ ทองโกย นักวิชาการสาธารณสุขปฏิบัติการ';
-  const tg=cType==='A'?`แบบ A: "${ds||'วันที่...'} นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ ได้ดำเนินการ..."`:
-    `แบบ B: "${ds||'วันที่...'} นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ มอบหมายให้ ${as2}..."`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,
-        messages:[{role:'user',content:`เขียนเนื้อหาข่าวประชาสัมพันธ์ สสอ.เขาค้อ จ.เพชรบูรณ์
-กิจกรรม: ${ti}  วันที่: ${ds||'[วันที่]'}  สถานที่: ${vn||'[สถานที่]'}  รูปแบบ: ${tg}
-ต้องการ 3 ย่อหน้า: 1) บอกว่าใคร ทำอะไร ที่ไหน  2) วัตถุประสงค์  3) ผลการดำเนินงาน
-ขึ้นบรรทัดว่างระหว่างย่อหน้า ภาษาราชการไทย ห้ามมีคำอธิบายนำ`}]})});
-    const d=await res.json();const txt=d.content?.[0]?.text||'';
-    if(txt){document.getElementById('f-body').value=txt.trim();ua();as();updateCC();pushUndo();toast('🤖 AI เขียนเสร็จ');}
-    else{fillTpl();toast('⚠️ ใช้ template แทน');}
-  }catch(e){fillTpl();toast('⚠️ ใช้ template แทน');}
-  finally{btn.disabled=false;spin.classList.remove('show');}
+  const ti = v('f-title');
+  if(!ti){ toast('❌ กรุณาใส่หัวข้อก่อน'); return; }
+  
+  const btn = document.getElementById('ai-btn'), spin = document.getElementById('ai-spin');
+  btn.disabled = true; spin.classList.add('show');
+
+  const ds = v('f-date') ? dfull(v('f-date')) : '';
+  const vn = v('f-venue');
+  const as2 = v('f-assignee') || 'นายชยานันต์ จันทร์คำ  นักวิชาการสาธารณสุข';
+  
+  // สร้างคำสั่งที่จะส่งให้ AI
+  const promptText = `เขียนข่าวประชาสัมพันธ์ สสอ.เขาค้อ เรื่อง: ${ti} วันที่: ${ds} สถานที่: ${vn} 
+  เขียนเป็นภาษาราชการ 3 ย่อหน้า แบ่งบรรทัดให้ชัดเจน ไม่ต้องมีคำนำ โดยนางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ เป็นประธานหรือผู้มอบหมาย`;
+
+  try {
+    // ⚠️ แก้ไขตรงนี้: นำ URL ที่ได้จาก Google Apps Script (ที่ลงท้ายด้วย /exec) มาวางแทนที่
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxXmkfhxin6kc8xb01UwY2wbeDqlNdolggcJ8V0p0_fKFMuXWLUkWwwNl950XEHciFhTw/exec"; 
+
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ "prompt": promptText })
+    });
+    
+    const d = await res.json();
+    if(d.text) {
+      document.getElementById('f-body').value = d.text.trim();
+      ua(); as(); updateCC(); pushUndo();
+      toast('🤖 AI เขียนข่าวให้เรียบร้อยครับ');
+    }
+  } catch(e) {
+    fillTpl(); // ถ้าระบบขัดข้อง ให้กลับไปใช้ Template พื้นฐาน
+    toast('⚠️ ระบบ AI ขัดข้อง กำลังใช้ Template แทน...');
+  } finally {
+    btn.disabled = false; spin.classList.remove('show');
+  }
 }
 
 // ════ DATE ════
