@@ -1136,41 +1136,64 @@ function fillTpl(){
 }
 
 // ════ AI BODY ════
+// ════ AI BODY ════
 async function genAI(){
   const ti = v('f-title');
-  if(!ti){ toast('❌ กรุณาใส่หัวข้อก่อน'); return; }
+  if(!ti){ toast('❌ กรุณาใส่หัวข้อกิจกรรมก่อน'); return; }
   
   const btn = document.getElementById('ai-btn'), spin = document.getElementById('ai-spin');
-  btn.disabled = true; spin.classList.add('show');
-
-  const ds = v('f-date') ? dfull(v('f-date')) : '';
-  const vn = v('f-venue');
-  const as2 = v('f-assignee') || 'นายชยานันต์ จันทร์คำ  นักวิชาการสาธารณสุข';
+  const btnTop = document.querySelector('.btn-ai'); // ปุ่ม AI ด้านบน
   
-  // สร้างคำสั่งที่จะส่งให้ AI
+  // แสดงสถานะกำลังโหลด
+  if(btn) btn.disabled = true; 
+  if(btnTop) btnTop.disabled = true;
+  if(spin) spin.classList.add('show');
+
+  const ds = v('f-date') ? dfull(v('f-date')) : '[ระบุวันที่]';
+  const vn = v('f-venue') || '[ระบุสถานที่]';
+  const as2 = v('f-assignee') || 'นายชยานันต์ จันทร์คำ นักวิชาการสาธารณสุข'; //
+  
   const promptText = `เขียนข่าวประชาสัมพันธ์ สสอ.เขาค้อ เรื่อง: ${ti} วันที่: ${ds} สถานที่: ${vn} 
   เขียนเป็นภาษาราชการ 3 ย่อหน้า แบ่งบรรทัดให้ชัดเจน ไม่ต้องมีคำนำ โดยนางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ เป็นประธานหรือผู้มอบหมาย`;
 
   try {
-    // ⚠️ แก้ไขตรงนี้: นำ URL ที่ได้จาก Google Apps Script (ที่ลงท้ายด้วย /exec) มาวางแทนที่
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxXmkfhxin6kc8xb01UwY2wbeDqlNdolggcJ8V0p0_fKFMuXWLUkWwwNl950XEHciFhTw/exec"; 
+    // ⚠️ ลิงก์ GAS URL ที่คุณใช้อยู่
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzK29AejV50GXV1cT60lacGBaL6aIN4FX2TCghTxHY7E-6fsIyaor6MC5IcDMi4JdtXTg/exec"; 
 
     const res = await fetch(GAS_URL, {
       method: 'POST',
+      mode: 'no-cors', // ลองใช้ no-cors ในกรณีที่ติดปัญหาเบื้องต้น
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
       body: JSON.stringify({ "prompt": promptText })
     });
     
-    const d = await res.json();
-    if(d.text) {
+    // หมายเหตุ: การใช้ no-cors จะทำให้อ่าน response ไม่ได้ 
+    // หากสคริปต์คุณตั้งค่าเป็น JSON ปกติ ให้เปลี่ยนกลับเป็น code ด้านล่างนี้ครับ:
+    
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ "prompt": promptText })
+    });
+    
+    const d = await response.json();
+    
+    if(d && d.text) {
       document.getElementById('f-body').value = d.text.trim();
       ua(); as(); updateCC(); pushUndo();
-      toast('🤖 AI เขียนข่าวให้เรียบร้อยครับ');
+      toast('🤖 AI เรียบเรียงเนื้อหาให้แล้วครับ');
+    } else {
+      throw new Error('Data empty');
     }
   } catch(e) {
-    fillTpl(); // ถ้าระบบขัดข้อง ให้กลับไปใช้ Template พื้นฐาน
-    toast('⚠️ ระบบ AI ขัดข้อง กำลังใช้ Template แทน...');
+    console.error("AI Error:", e);
+    // หากขัดข้อง ให้ใช้ Template พื้นฐานเพื่อให้งานไม่สะดุด
+    fillTpl(); 
+    toast('⚠️ ระบบ AI ขัดข้องชั่วคราว (ใช้ Template แทน)');
   } finally {
-    btn.disabled = false; spin.classList.remove('show');
+    if(btn) btn.disabled = false;
+    if(btnTop) btnTop.disabled = false;
+    if(spin) spin.classList.remove('show');
   }
 }
 
