@@ -1150,12 +1150,11 @@ async function genAI(){
   const promptText = `เขียนข่าวประชาสัมพันธ์ สสอ.เขาค้อ เรื่อง: ${ti} วันที่: ${ds} สถานที่: ${vn} 
   เขียนเป็นภาษาราชการ 3 ย่อหน้า แบ่งบรรทัดให้ชัดเจน ไม่ต้องมีคำนำ`;
 
-  // ใส่ API KEY ของคุณ
-  const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU"; 
-  
-  // 💡 แก้ไขจุดนี้: ใช้ v1beta และรุ่น gemini-1.5-flash
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+/ 1. ระบุรหัส API Key ของคุณ
+const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU";[cite: 1]
 
+// 2. ใช้ URL รุ่น gemini-1.5-flash-latest (เสถียรที่สุดสำหรับปี 2026)
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;[cite: 1, 2]
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
