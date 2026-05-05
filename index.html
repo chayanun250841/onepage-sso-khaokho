@@ -178,17 +178,6 @@ textarea{line-height:1.65}
 .lay-lbl{font-size:10.5px;color:#888}
 .crop-panel{background:#f5f0ff;border:1.5px solid #d8ccf8;border-radius:7px;padding:8px 10px;margin-bottom:7px;display:none}
 .crop-panel.show{display:block}
-.crop-preview-box {
-  width: 100%;
-  height: 150px;
-  background: #eee;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .crop-ttl{font-size:10.5px;font-weight:700;color:#6D28D9;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
 .crop-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
 .cpb{padding:4px 2px;border-radius:4px;border:1.5px solid #d8ccf8;background:white;cursor:pointer;font-size:9px;font-weight:700;color:#6b46c1;text-align:center;font-family:'Sarabun',sans-serif}
@@ -200,17 +189,7 @@ textarea{line-height:1.65}
 .thumbs{display:grid;gap:4px;margin-bottom:7px}
 .thumb{position:relative;border-radius:6px;overflow:hidden;background:#d0e4d8;cursor:grab;border:2px solid transparent;user-select:none}
 .thumb.drag-src{opacity:0.4;border-color:var(--c2);border-style:dashed}
-.thumb img {
-  width: 100%;
-  height: 100%;
-  /* บังคับให้รูปเต็มกรอบโดยไม่เสียสัดส่วน */
-  object-fit: cover !important; 
-  display: block;
-  /* ป้องกันการคลิกโดนรูปโดยไม่ตั้งใจขณะลากวาง */
-  pointer-events: none; 
-  /* ทำให้เวลาเปลี่ยนจุดโฟกัส (บน/กลาง/ล่าง) รูปจะค่อยๆ เลื่อนอย่างนุ่มนวล */
-  transition: object-position 0.2s; 
-}
+.thumb img{width:100%;height:58px;object-fit:cover;display:block;pointer-events:none}
 .thumb-rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:white;border:none;border-radius:50%;width:17px;height:17px;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;font-weight:700}
 .thumb:hover .thumb-rm{display:flex}
 .thumb-n{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.5);color:white;font-size:8px;font-weight:700;padding:1px 4px;border-radius:2px}
@@ -397,13 +376,7 @@ textarea{line-height:1.65}
 .pg-8{grid-template-columns:repeat(4,1fr)}.pg-8 .pi{height:calc(var(--ph-scale)*135px)}
 .pg-8b{grid-template-columns:1fr 1fr}.pg-8b .pi{height:calc(var(--ph-scale)*135px)}
 .pi{overflow:hidden;background:#c0d8c8}
-.pi img {
-  width: 100%; 
-  height: 100%; 
-  object-fit: cover !important; 
-  display: block; 
-  transition: object-position 0.2s; 
-}
+.pi img{width:100%;height:100%;object-fit:cover;display:block;transition:object-position 0.3s}
 .pi-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;color:#aaa;font-size:10px;background:#eff5f1}
 
 /* SCROLLBAR */
@@ -1294,46 +1267,9 @@ function dOV(e,i){e.preventDefault();document.querySelectorAll('.thumb')[i].clas
 function dLV(i){document.querySelectorAll('.thumb')[i].classList.remove('drop-tgt');}
 function dE(){document.querySelectorAll('.thumb').forEach(el=>el.classList.remove('drag-src','drop-tgt'));}
 function dDp(e,i){e.preventDefault();if(dragIdx===null||dragIdx===i)return;const m=photos.splice(dragIdx,1)[0];photos.splice(i,0,m);dragIdx=null;renderThumbs();renderPhPrev();toast('↕️ เรียงใหม่แล้ว');}
-function openCrop(i) {
-    cropIdx = i;
-    const p = photos[i];
-    document.getElementById('crop-num').textContent = i + 1;
-    document.getElementById('crop-panel').classList.add('show');
-    
-    // --- จุดนี้คือที่ต้องเพิ่มเพื่อให้เห็นรูปพรีวิวตอนกด ---
-    const prevImg = document.getElementById('crop-preview-img');
-    if(prevImg) {
-        prevImg.src = p.b64;
-        prevImg.style.objectPosition = p.cp || 'center';
-    }
-
-    // --- ส่วนที่คุณส่งรูปมา (บรรทัด 1311 ในรูปของคุณ) ---
-    const positions = [
-        {id:'top center', lb:'บน'}, {id:'center', lb:'กลาง'}, {id:'bottom center', lb:'ล่าง'},
-        {id:'center left', lb:'ซ้าย'}, {id:'center right', lb:'ขวา'}
-    ];
-    document.getElementById('crop-g').innerHTML = positions.map(c => `
-        <button class="cpb ${c.id === (p.cp || 'center') ? 'on' : ''}" 
-                onclick="setCrop('${c.id}')">${c.lb}</button>
-    `).join('');
-}
-function closeCrop() {
-    cropIdx = null;
-    document.getElementById('crop-panel').classList.remove('show');
-}
-function setCrop(pos) {
-    if (cropIdx === null) return;
-    
-    // บันทึกตำแหน่งใหม่ลงในฐานข้อมูลรูปภาพ
-    photos[cropIdx].cp = pos; 
-    
-    // สั่งวาดรูปใหม่ทั้งในเมนู (ซ้าย) และในหน้าพรีวิว A4 (ขวา)
-    renderThumbs(); 
-    renderPhPrev(); 
-    
-    // เรียก openCrop อีกครั้งเพื่ออัปเดตสีปุ่มไฮไลท์ (.on)
-    openCrop(cropIdx); 
-}
+function openCrop(i){cropIdx=i;document.getElementById('crop-num').textContent=i+1;document.getElementById('crop-panel').classList.add('show');const cur=photos[i].cp||'center';document.getElementById('crop-g').innerHTML=CROP_POS.map(c=>`<button class="cpb${c.id===cur?' on':''}" onclick="setCrop('${c.id}')">${c.lb}</button>`).join('');}
+function closeCrop(){cropIdx=null;document.getElementById('crop-panel').classList.remove('show');}
+function setCrop(pos){if(cropIdx===null)return;photos[cropIdx].cp=pos;renderThumbs();renderPhPrev();openCrop(cropIdx);}
 
 const LAYS={1:[{id:'pg-1',l:'เต็ม'}],2:[{id:'pg-2',l:'2คอล'},{id:'pg-2h',l:'2แถว'}],3:[{id:'pg-3',l:'1ใหญ่+2'},{id:'pg-6',l:'3เท่า'}],4:[{id:'pg-4',l:'2×2'},{id:'pg-4b',l:'4แถว'}],5:[{id:'pg-5',l:'1ใหญ่+4'},{id:'pg-6',l:'3+2'}],6:[{id:'pg-6',l:'3×2'},{id:'pg-6b',l:'2×3'}],7:[{id:'pg-7',l:'3+4'}],8:[{id:'pg-8',l:'4×2'},{id:'pg-8b',l:'2×4'}]};
 const LNAMES={'pg-1':'1เต็ม','pg-2':'2คอล','pg-2h':'2แถว','pg-3':'1ใหญ่+2','pg-4':'2×2','pg-4b':'4แถว','pg-5':'1ใหญ่+4','pg-6':'3×2','pg-6b':'2×3','pg-7':'3+4','pg-8':'4×2','pg-8b':'2×4'};
@@ -1343,31 +1279,15 @@ function renderLayOpts(){const n=photos.length;const w=document.getElementById('
 function pickLay(id){cLayout=id;renderLayOpts();renderPhPrev();}
 
 // ★ KEY FIX: use p.b64 (not blob URL) so preview works in iframe sandbox ★
-function renderPhPrev() {
-    const el = document.getElementById('prev-photos');
-    if (!photos.length) {
-        el.innerHTML = '<div class="op-photos-empty">📷 รูปกิจกรรมจะปรากฏที่นี่</div>';
-        ua(); return;
-    }
-
-    const cls = cLayout || 'pg-' + Math.min(photos.length, 8);
-    const slots = LSLOTS[cls] || photos.length;
-    
-    // --- เริ่มต้นสร้าง HTML สำหรับ Grid รูปภาพ ---
-    let html = `<div class="photo-grid ${cls}">`;
-    
-    // *** จุดที่มี html += และ style ที่คุณตามหาอยู่ตรงนี้ครับ ***
-    photos.forEach((p, i) => {
-    // เปลี่ยนจากแท็ก <img> เป็นการใส่ style background แทน เพื่อป้องกันภาพยืด
-   html += `<div class="pi" style="background-image: url('${p.b64}'); background-size: cover; background-position: ${p.cp || 'center'};"></div>`;
-
-    for (let i = photos.length; i < slots; i++) {
-        html += `<div class="pi"><div class="pi-ph">📷<br><span style="font-size:8px">รูป ${i + 1}</span></div></div>`;
-    }
-
-    html += '</div>';
-    el.innerHTML = html;
-    ua();
+function renderPhPrev(){
+  const el=document.getElementById('prev-photos');
+  if(!photos.length){el.innerHTML='<div class="op-photos-empty">📷 รูปกิจกรรมจะปรากฏที่นี่</div>';ua();return;}
+  const cls=cLayout||'pg-'+Math.min(photos.length,8);
+  const slots=LSLOTS[cls]||photos.length;
+  let html=`<div class="photo-grid ${cls}">`;
+  photos.forEach((p,i)=>{html+=`<div class="pi"><img src="${p.b64}" style="object-position:${p.cp||'center'}" loading="lazy"></div>`;});
+  for(let i=photos.length;i<slots;i++)html+=`<div class="pi"><div class="pi-ph">📷<br><span style="font-size:8px">รูป ${i+1}</span></div></div>`;
+  html+='</div>';el.innerHTML=html;ua();
 }
 
 // ════ AUTO SAVE ════
@@ -1433,9 +1353,7 @@ function buildPrintHTML(){
   if(photos.length>0){
     const cls=cLayout||'pg-'+Math.min(photos.length,8);
     phHtml=`<div class="photo-grid ${cls}">`;
-    photos.forEach((p, i) => {
-    phHtml += `<div class="pi" style="background-image: url('${p.b64}'); background-size: cover; background-position: ${p.cp || 'center'}; height: 100%;"></div>`;
-});
+    photos.forEach((p,i)=>{phHtml+=`<div class="pi"><img src="${p.b64}" style="object-position:${p.cp||'center'}" alt="${i+1}"></div>`;});
     phHtml+='</div>';
   }
 
