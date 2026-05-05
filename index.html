@@ -1359,8 +1359,7 @@ function renderPhPrev() {
     // *** จุดที่มี html += และ style ที่คุณตามหาอยู่ตรงนี้ครับ ***
     photos.forEach((p, i) => {
     // เปลี่ยนจากแท็ก <img> เป็นการใส่ style background แทน เพื่อป้องกันภาพยืด
-    html += `<div class="pi" style="background-image: url('${p.b64}'); background-size: cover; background-position: ${p.cp || 'center'}; height: 100%;"></div>`;
-});
+   html += `<div class="pi" style="background-image: url('${p.b64}'); background-size: cover; background-position: ${p.cp || 'center'};"></div>`;
 
     for (let i = photos.length; i < slots; i++) {
         html += `<div class="pi"><div class="pi-ph">📷<br><span style="font-size:8px">รูป ${i + 1}</span></div></div>`;
