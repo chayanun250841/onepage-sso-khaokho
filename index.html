@@ -947,7 +947,7 @@ function saveSizes(){
   const ks=['fs-badge','fs-org','fs-name','fs-date','fs-title','fs-label','fs-body','fs-footer','line-h','ph-scale','ph-mg','flogo-size-0','flogo-size-1','flogo-size-2'];
   const s={};ks.forEach(k=>{const el=document.getElementById(k);if(el)s[k]=el.value;});
   s.flogo_pos=document.getElementById('flogo-pos')?.value||'center';
-  try{localStorage.setItem('op7_sizes',JSON.stringify(s));}catch(e){}
+  {localStorage.setItem('op7_sizes',JSON.stringify(s));}catch(e){}
 }
 function loadSizes(){
   try{
@@ -1151,30 +1151,35 @@ async function genAI(){
   เขียนเป็นภาษาราชการ 3 ย่อหน้า แบ่งบรรทัดให้ชัดเจน ไม่ต้องมีคำนำ`;
 
   try {
-    // ⚠️ แก้ไขลิงก์บรรทัดนี้ให้เป็น URL ของคุณ
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxy4ySipWPfKH5YH2tV8bf2deqTsPTvQvXxizePYgxCu6LcvRYQ9E9sLTKAZ6Xd0YCBXg/exec"; 
+  const GAS_URL = "https://script.google.com/macros/s/ของคุณ/exec"; // URL ใหม่ที่ได้จากการ Deploy
 
-    // ✅ เติม headers ตรงนี้เพื่อแก้ปัญหา CORS
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ "prompt": promptText })
-    });
-    
-    const d = await res.json();
-    if(d.text) {
-      document.getElementById('f-body').value = d.text.trim();
-      ua(); as(); updateCC(); pushUndo();
-      toast('🤖 AI เขียนให้เรียบร้อยครับ');
-    } else {
-      throw new Error('AI Response Error');
-    }
-  } catch(e) {
-    fillTpl(); // ถ้า Error ให้กลับไปใช้ Template เหมือนเดิม
-    toast('⚠️ ระบบ AI ขัดข้อง กำลังใช้ Template แทน...');
-  } finally {
-    btn.disabled = false; spin.classList.remove('show');
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ "prompt": promptText })
+  });
+
+  const d = await res.json();
+  
+  if (d.text) {
+    document.getElementById('f-body').value = d.text.trim();
+    ua(); as(); updateCC(); pushUndo();
+    toast('🤖 AI เขียนให้เรียบร้อยครับ');
+  } else if (d.error) {
+    // 💡 ดักจับ Error ที่ Apps Script ส่งกลับมา
+    console.error("API/Server Error:", d.error);
+    toast('❌ เกิดข้อผิดพลาดจาก AI: ดูรายละเอียดใน Console');
+    fillTpl(); 
+  } else {
+    throw new Error('ไม่พบข้อมูล AI');
   }
+} catch (e) {
+  console.error("Fetch Error:", e); // 💡 ปริ้นท์ Error ลง Console เพื่อให้เราตรวจสอบได้
+  fillTpl(); 
+  toast('⚠️ ระบบเชื่อมต่อขัดข้อง กำลังใช้ Template แทน...');
+} finally {
+  btn.disabled = false; spin.classList.remove('show');
+}
 }
 
 // ════ DATE ════
