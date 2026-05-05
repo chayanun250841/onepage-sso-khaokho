@@ -1136,6 +1136,7 @@ function fillTpl(){
 }
 
 // ════ AI BODY ════
+// ════ AI BODY (ต่อตรงเข้า Gemini แบบไม่ผ่าน Apps Script) ════
 async function genAI(){
   const ti = v('f-title');
   if(!ti){ toast('❌ กรุณาใส่หัวข้อก่อน'); return; }
@@ -1146,40 +1147,42 @@ async function genAI(){
   const ds = v('f-date') ? dfull(v('f-date')) : '';
   const vn = v('f-venue');
   
-  // สร้างคำสั่งที่จะส่งให้ AI
+  // คำสั่งที่ส่งให้ AI
   const promptText = `เขียนข่าวประชาสัมพันธ์ สสอ.เขาค้อ เรื่อง: ${ti} วันที่: ${ds} สถานที่: ${vn} 
   เขียนเป็นภาษาราชการ 3 ย่อหน้า แบ่งบรรทัดให้ชัดเจน ไม่ต้องมีคำนำ`;
 
+  // ⚠️ 1. ใส่ API KEY ของ Gemini ตรงนี้
+  const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU"; // คีย์เดิมของคุณ
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
   try {
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxraF6HXWKfJDTKlHym56nRrPPcZWNDQceaCZ1ssGmmwbB6ivikPh_ku-uFfNwT_BC_vw/exec"; // URL ใหม่ที่ได้จากการ Deploy
-
-  const res = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ "prompt": promptText })
-  });
-
-  const d = await res.json();
-  
-  if (d.text) {
-    document.getElementById('f-body').value = d.text.trim();
-    ua(); as(); updateCC(); pushUndo();
-    toast('🤖 AI เขียนให้เรียบร้อยครับ');
-  } else if (d.error) {
-    // 💡 ดักจับ Error ที่ Apps Script ส่งกลับมา
-    console.error("API/Server Error:", d.error);
-    toast('❌ เกิดข้อผิดพลาดจาก AI: ดูรายละเอียดใน Console');
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        "contents": [{ "parts": [{ "text": promptText }] }]
+      })
+    });
+    
+    const d = await res.json();
+    
+    if (d.candidates && d.candidates[0].content) {
+      // ดึงข้อความมาใส่ในช่องเนื้อหา
+      document.getElementById('f-body').value = d.candidates[0].content.parts[0].text.trim();
+      ua(); as(); updateCC(); pushUndo();
+      toast('🤖 AI เขียนให้เรียบร้อยครับ');
+    } else if (d.error) {
+      console.error("API Error:", d.error);
+      toast('❌ AI แจ้งปัญหา: ' + d.error.message);
+      fillTpl(); 
+    }
+  } catch(e) {
+    console.error("Fetch Error:", e);
     fillTpl(); 
-  } else {
-    throw new Error('ไม่พบข้อมูล AI');
+    toast('⚠️ ระบบเชื่อมต่อขัดข้อง กำลังใช้ Template แทน...');
+  } finally {
+    btn.disabled = false; spin.classList.remove('show');
   }
-} catch (e) {
-  console.error("Fetch Error:", e); // 💡 ปริ้นท์ Error ลง Console เพื่อให้เราตรวจสอบได้
-  fillTpl(); 
-  toast('⚠️ ระบบเชื่อมต่อขัดข้อง กำลังใช้ Template แทน...');
-} finally {
-  btn.disabled = false; spin.classList.remove('show');
-}
 }
 
 // ════ DATE ════
