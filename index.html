@@ -1358,10 +1358,9 @@ function renderPhPrev() {
     
     // *** จุดที่มี html += และ style ที่คุณตามหาอยู่ตรงนี้ครับ ***
     photos.forEach((p, i) => {
-        html += `<div class="pi">
-                    <img src="${p.b64}" style="object-position: ${p.cp || 'center'}" loading="lazy">
-                 </div>`;
-    });
+    // เปลี่ยนจากแท็ก <img> เป็นการใส่ style background แทน เพื่อป้องกันภาพยืด
+    html += `<div class="pi" style="background-image: url('${p.b64}'); background-size: cover; background-position: ${p.cp || 'center'}; height: 100%;"></div>`;
+});
 
     for (let i = photos.length; i < slots; i++) {
         html += `<div class="pi"><div class="pi-ph">📷<br><span style="font-size:8px">รูป ${i + 1}</span></div></div>`;
@@ -1435,7 +1434,9 @@ function buildPrintHTML(){
   if(photos.length>0){
     const cls=cLayout||'pg-'+Math.min(photos.length,8);
     phHtml=`<div class="photo-grid ${cls}">`;
-    photos.forEach((p,i)=>{phHtml+=`<div class="pi"><img src="${p.b64}" style="object-position:${p.cp||'center'}" alt="${i+1}"></div>`;});
+    photos.forEach((p, i) => {
+    phHtml += `<div class="pi" style="background-image: url('${p.b64}'); background-size: cover; background-position: ${p.cp || 'center'}; height: 100%;"></div>`;
+});
     phHtml+='</div>';
   }
 
