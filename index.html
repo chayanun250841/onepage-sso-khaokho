@@ -1135,7 +1135,6 @@ function fillTpl(){
   toast('✨ เติม template แล้ว');
 }
 
-// ════ AI BODY ════
 // ════ AI BODY (ต่อตรงเข้า Gemini แบบไม่ผ่าน Apps Script) ════
 async function genAI(){
   const ti = v('f-title');
@@ -1151,9 +1150,11 @@ async function genAI(){
   const promptText = `เขียนข่าวประชาสัมพันธ์ สสอ.เขาค้อ เรื่อง: ${ti} วันที่: ${ds} สถานที่: ${vn} 
   เขียนเป็นภาษาราชการ 3 ย่อหน้า แบ่งบรรทัดให้ชัดเจน ไม่ต้องมีคำนำ`;
 
-  // ⚠️ 1. ใส่ API KEY ของ Gemini ตรงนี้
-  const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU"; // คีย์เดิมของคุณ
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+  // ใส่ API KEY ของคุณ
+  const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU"; 
+  
+  // 💡 แก้ไขจุดนี้: เปลี่ยนชื่อโมเดลเป็น gemini-pro (รุ่นที่เสถียรที่สุดและรองรับแน่นอน)
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
   try {
     const res = await fetch(API_URL, {
