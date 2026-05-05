@@ -1154,7 +1154,7 @@ async function genAI(){
   const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU"; 
   
   // 💡 แก้ไขจุดนี้: เปลี่ยนชื่อโมเดลเป็น gemini-pro (รุ่นที่เสถียรที่สุดและรองรับแน่นอน)
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+  const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${API_KEY}`;
 
   try {
     const res = await fetch(API_URL, {
