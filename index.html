@@ -947,7 +947,7 @@ function saveSizes(){
   const ks=['fs-badge','fs-org','fs-name','fs-date','fs-title','fs-label','fs-body','fs-footer','line-h','ph-scale','ph-mg','flogo-size-0','flogo-size-1','flogo-size-2'];
   const s={};ks.forEach(k=>{const el=document.getElementById(k);if(el)s[k]=el.value;});
   s.flogo_pos=document.getElementById('flogo-pos')?.value||'center';
-  {localStorage.setItem('op7_sizes',JSON.stringify(s));}catch(e){}
+  try{localStorage.setItem('op7_sizes',JSON.stringify(s));}catch(e){}
 }
 function loadSizes(){
   try{
@@ -1179,6 +1179,7 @@ async function genAI(){
   toast('⚠️ ระบบเชื่อมต่อขัดข้อง กำลังใช้ Template แทน...');
 } finally {
   btn.disabled = false; spin.classList.remove('show');
+}
 }
 
 // ════ DATE ════
