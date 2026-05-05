@@ -1153,8 +1153,8 @@ async function genAI(){
   // ใส่ API KEY ของคุณ
   const API_KEY = "AIzaSyAEgGQG4HwGu68bEPgpalkfaHH1L2OfDGU"; 
   
-  // 💡 แก้ไขจุดนี้: เปลี่ยนชื่อโมเดลเป็น gemini-pro (รุ่นที่เสถียรที่สุดและรองรับแน่นอน)
-  const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${API_KEY}`;
+  // 💡 แก้ไขจุดนี้: ใช้ v1beta และรุ่น gemini-1.5-flash
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
   try {
     const res = await fetch(API_URL, {
@@ -1185,7 +1185,6 @@ async function genAI(){
     btn.disabled = false; spin.classList.remove('show');
   }
 }
-
 // ════ DATE ════
 const MF=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const MS=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
