@@ -2,20 +2,29 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>One-Page Builder v8 — สสอ.เขาค้อ</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Prompt:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
+/* ══════════ RESET ══════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --c1:#005C30;--c2:#007A40;--c3:#00A050;--c4:#D4F0E0;--c5:#EBF7F0;--gold:#B8860B;
   --panel-w:370px;
 }
-html,body{height:100%;font-family:'Sarabun',sans-serif;color:#1a1a1a;font-size:14px;background:#E5EAE7;overflow:hidden}
-.app{display:flex;flex-direction:column;height:100svh}
-.topbar{background:linear-gradient(135deg,var(--c1),var(--c2));color:white;padding:0 14px;height:48px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.3);z-index:300}
+html,body{height:100%;font-family:'Sarabun',sans-serif;color:#1a1a1a;font-size:14px;background:#E5EAE7;/* overflow managed by .app not body */}
+.app{-webkit-overflow-scrolling:touch}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+
+/* ══════════ TOPBAR ══════════ */
+.topbar{
+  background:linear-gradient(135deg,var(--c1),var(--c2));
+  color:white;padding:0 14px;height:48px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,0.3);z-index:300;
+}
 .tb-l{display:flex;align-items:center;gap:9px}
 .tb-logo{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .tb-title{font-family:'Prompt',sans-serif;font-weight:700;font-size:13px;white-space:nowrap}
@@ -24,38 +33,60 @@ html,body{height:100%;font-family:'Sarabun',sans-serif;color:#1a1a1a;font-size:1
 .tb-r{display:flex;gap:5px;align-items:center}
 .si{font-size:10px;opacity:0.65;display:flex;align-items:center;gap:3px;margin-right:4px}
 .sdot{width:5px;height:5px;border-radius:50%;background:#4caf7a;flex-shrink:0}
-.btn{padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:700;transition:all 0.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.btn{padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:700;transition:all 0.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .btn-o{background:rgba(255,255,255,0.14);color:white;border:1px solid rgba(255,255,255,0.26)}.btn-o:hover{background:rgba(255,255,255,0.22)}
 .btn-w{background:white;color:var(--c1)}.btn-w:hover{background:#f5fdf8}
 .btn-g{background:var(--c2);color:white}.btn-g:hover{background:var(--c1)}
-.btn-ai{background:linear-gradient(135deg,#0066CC,#004899);color:white}.btn-ai:hover{filter:brightness(1.1)}
+.btn-ai{background:linear-gradient(135deg,#6D28D9,#4338CA);color:white}.btn-ai:hover{filter:brightness(1.1)}
 .btn:disabled{opacity:0.45;cursor:not-allowed}
+/* hide tb-sub on very small screens */
 @media(max-width:600px){.tb-sub,.si{display:none!important}}
-.workspace{display:flex;flex:1;overflow:hidden;position:relative}
-.panel-l{width:var(--panel-w);flex-shrink:0;background:white;border-right:1px solid #C8DDD5;display:flex;flex-direction:column;overflow:hidden;transition:transform 0.3s;z-index:200}
+
+/* ══════════ WORKSPACE ══════════ */
+.workspace{display:flex;flex:1;overflow:hidden;position:relative;-webkit-overflow-scrolling:touch}
+
+/* ══════════ LEFT PANEL ══════════ */
+.panel-l{
+  width:var(--panel-w);flex-shrink:0;
+  background:white;border-right:1px solid #C8DDD5;
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:transform 0.3s;
+  z-index:200;
+}
+/* Mobile: panel slides over */
 @media(max-width:840px){
-  .panel-l{position:absolute;left:0;top:0;bottom:0;width:min(var(--panel-w),90vw);box-shadow:4px 0 20px rgba(0,0,0,0.2);transform:translateX(-100%)}
+  .panel-l{
+    position:absolute;left:0;top:0;bottom:0;
+    width:min(var(--panel-w),90vw);
+    box-shadow:4px 0 20px rgba(0,0,0,0.2);
+    transform:translateX(-100%);
+  }
   .panel-l.open{transform:translateX(0)}
   .panel-overlay{display:block!important}
 }
-.panel-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:190}
+.panel-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:190;pointer-events:none;-webkit-tap-highlight-color:transparent}
+
 .tabs{display:flex;border-bottom:2px solid #C8DDD5;background:#f8f8f8;flex-shrink:0;overflow-x:auto}
-.tab{flex:1;min-width:52px;padding:9px 2px;text-align:center;border:none;background:none;cursor:pointer;font-family:'Sarabun',sans-serif;font-size:10.5px;font-weight:700;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s;position:relative;white-space:nowrap}
+.tab{flex:1;min-width:52px;padding:9px 2px;text-align:center;border:none;background:none;cursor:pointer;font-family:'Sarabun',sans-serif;font-size:10.5px;font-weight:700;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s;position:relative;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:44px}
 .tab.active{color:var(--c1);border-bottom-color:var(--c1);background:white}
 .tbn{position:absolute;top:4px;right:5px;background:var(--c2);color:white;font-size:8px;font-weight:700;padding:1px 4px;border-radius:6px;display:none}
 .tbn.on{display:inline-block}
-.pb{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
+.pb{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .ps{display:none}.ps.active{display:block}
+
+/* FORM */
 .field{margin-bottom:11px}
 .fl{font-size:11px;font-weight:700;color:#444;margin-bottom:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .req{background:#C0392B;color:white;font-size:8.5px;padding:1px 5px;border-radius:3px}
 .opt{background:#ddd;color:#555;font-size:8.5px;padding:1px 5px;border-radius:3px}
 .fh{font-size:10.5px;color:#888;margin-bottom:3px;line-height:1.5}
-input[type=text],input[type=date],textarea{width:100%;padding:8px 11px;border:1.5px solid #C8DDD5;border-radius:7px;font-family:'Sarabun',sans-serif;font-size:13.5px;color:#1a1a1a;background:white;transition:border-color 0.15s;resize:none;-webkit-appearance:none}
+input[type=text],input[type=date],textarea{width:100%;padding:8px 11px;border:1.5px solid #C8DDD5;border-radius:7px;font-family:'Sarabun',sans-serif;font-size:16px;color:#1a1a1a;background:white;transition:border-color 0.15s;resize:none;-webkit-appearance:none;touch-action:manipulation}
 input:focus,textarea:focus{outline:none;border-color:var(--c2);box-shadow:0 0 0 3px rgba(0,122,64,0.09)}
 textarea{line-height:1.65}
 .cc{font-size:10px;color:#888;text-align:right;margin-top:2px}
 .cc.warn{color:#e67e22}.cc.over{color:#C0392B}
+
+/* TYPE */
 .type-row{display:flex;gap:6px;margin-bottom:11px}
 .tyb{flex:1;padding:8px 5px;border-radius:8px;border:2px solid #C8DDD5;background:white;cursor:pointer;text-align:center;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
 .tyb.on{border-color:var(--c2);background:var(--c5)}
@@ -63,14 +94,18 @@ textarea{line-height:1.65}
 .ty-lb{font-size:11.5px;font-weight:700;color:#444}
 .ty-ds{font-size:9.5px;color:#888;line-height:1.3}
 .tyb.on .ty-lb{color:var(--c1)}
+
+/* TEMPLATE */
 .tmpl{background:var(--c5);border:1px solid var(--c4);border-left:3px solid var(--c2);border-radius:6px;padding:7px 10px;margin-bottom:6px;font-size:10.5px;line-height:1.75;color:#444}
 .tmpl .sl{display:inline;background:var(--c4);border-radius:3px;padding:1px 5px;color:var(--c1);font-weight:700;font-size:10px}
+
+/* BTNS */
 .fill-btn{width:100%;padding:7px;border-radius:7px;background:var(--c5);border:1.5px dashed var(--c3);color:var(--c1);font-family:'Sarabun',sans-serif;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:all 0.15s;margin-top:4px;-webkit-tap-highlight-color:transparent}
 .fill-btn:hover{background:var(--c4);border-style:solid}
-.ai-btn{width:100%;padding:7px;border-radius:7px;background:linear-gradient(135deg,#0066CC,#004899);color:white;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12px;cursor:pointer;border:none;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:4px;transition:all 0.15s}
+.ai-btn{width:100%;padding:7px;border-radius:7px;background:linear-gradient(135deg,#6D28D9,#4338CA);color:white;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12px;cursor:pointer;border:none;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:4px;transition:all 0.15s}
 .ai-btn:hover{filter:brightness(1.1)}
 .ai-btn:disabled{opacity:0.5;cursor:not-allowed}
-.ai-spin{display:none;align-items:center;gap:4px;font-size:11px;color:#0066CC;margin-top:3px}
+.ai-spin{display:none;align-items:center;gap:4px;font-size:11px;color:#6D28D9;margin-top:3px}
 .ai-spin.show{display:flex}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin 0.9s linear infinite;display:inline-block}
@@ -78,6 +113,8 @@ textarea{line-height:1.65}
 .ubtn{padding:2px 8px;font-size:10px;border-radius:5px;border:1px solid #C8DDD5;background:#fafafa;cursor:pointer;color:#555;font-family:'Sarabun',sans-serif}
 .ubtn:hover:not(:disabled){background:var(--c5)}
 .ubtn:disabled{opacity:0.3;cursor:not-allowed}
+
+/* SHDR */
 .shdr{font-size:10.5px;font-weight:800;color:var(--c1);letter-spacing:0.5px;text-transform:uppercase;display:flex;align-items:center;gap:6px;margin:14px 0 8px}
 .shdr::after{content:'';flex:1;height:1px;background:var(--c4)}
 .div{height:1px;background:#C8DDD5;margin:10px 0}
@@ -85,6 +122,8 @@ textarea{line-height:1.65}
 .prog-l{display:flex;justify-content:space-between;margin-bottom:3px;font-size:10.5px;color:#888;font-weight:700}
 .prog-bar{height:5px;background:#e8e8e8;border-radius:4px;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--c2),var(--c3));border-radius:4px;transition:width 0.4s}
+
+/* LOGO/OFFICER/FOOTING UPLOAD AREAS */
 .logo-area{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .logo-prev{width:68px;height:68px;border-radius:7px;border:2px dashed #C8DDD5;background:#f8f8f8;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:all 0.2s}
 .logo-prev:hover{border-color:var(--c3);background:var(--c5)}
@@ -95,25 +134,41 @@ textarea{line-height:1.65}
 .up-hint{font-size:10px;color:#888;margin-top:2px;line-height:1.4}
 .mem-badge{display:none;background:var(--c4);color:var(--c1);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:3px;align-items:center;gap:3px}
 .mem-badge.show{display:inline-flex}
+
+/* Officer upload — portrait-shaped */
 .officer-area{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
 .officer-prev{width:56px;height:76px;border-radius:6px;border:2px dashed #C8DDD5;background:#f8f8f8;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:all 0.2s}
 .officer-prev:hover{border-color:var(--c3);background:var(--c5)}
 .officer-prev img{width:100%;height:100%;object-fit:cover;display:block}
 .officer-ph{font-size:20px;color:#ccc}
+
+/* Footer logo upload */
 .footer-logos-area{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
-.flogo-slot{position:relative;width:70px;height:52px;border:2px dashed #C8DDD5;border-radius:6px;background:#f8f8f8;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;transition:all 0.2s;flex-shrink:0}
+.flogo-slot{
+  position:relative;width:70px;height:52px;
+  border:2px dashed #C8DDD5;border-radius:6px;
+  background:#f8f8f8;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;overflow:hidden;transition:all 0.2s;flex-shrink:0;
+}
 .flogo-slot:hover{border-color:var(--c3);background:var(--c5)}
 .flogo-slot img{width:100%;height:100%;object-fit:contain;display:block}
 .flogo-ph{font-size:18px;color:#ccc}
-.flogo-slot .flogo-rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:700}
+.flogo-slot .flogo-rm{
+  position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:white;
+  border:none;border-radius:50%;width:16px;height:16px;font-size:9px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:700;
+}
 .flogo-slot:hover .flogo-rm{display:flex}
+
+/* SIZE CONTROLS */
 .size-group{background:#f8f8f8;border-radius:8px;padding:10px 11px;margin-bottom:10px;border:1px solid #EBEBEB}
 .sg-title{font-size:11px;font-weight:800;color:var(--c1);margin-bottom:8px}
 .s-row{display:flex;align-items:center;gap:7px;margin-bottom:7px}
 .s-lbl{font-size:10.5px;color:#444;font-weight:600;width:100px;flex-shrink:0}
 .s-slider{flex:1;height:4px;cursor:pointer;accent-color:var(--c2);min-width:0}
 .s-val{font-size:10.5px;font-weight:700;color:var(--c1);width:38px;text-align:right;flex-shrink:0}
-/* ── PHOTOS TAB ── */
+
+/* PHOTO */
 .dropzone{border:2px dashed #C8DDD5;border-radius:9px;padding:16px 12px;text-align:center;background:#E5EAE7;cursor:pointer;transition:all 0.2s;margin-bottom:9px}
 .dropzone.drag-over{border-color:var(--c2);background:var(--c5);border-style:solid}
 .dropzone:hover{border-color:var(--c3);background:var(--c5)}
@@ -122,23 +177,12 @@ textarea{line-height:1.65}
 .ph-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .ph-badge{display:inline-flex;align-items:center;gap:4px;background:var(--c4);color:var(--c1);font-size:11px;font-weight:700;padding:3px 9px;border-radius:9px}
 .lay-lbl{font-size:10.5px;color:#888}
-
-/* ── IMPROVED CROP PANEL ── */
-.crop-panel{background:#f0f4ff;border:1.5px solid #c0ccf0;border-radius:9px;padding:10px 11px;margin-bottom:7px;display:none}
+.crop-panel{background:#f5f0ff;border:1.5px solid #d8ccf8;border-radius:7px;padding:8px 10px;margin-bottom:7px;display:none}
 .crop-panel.show{display:block}
-.crop-ttl{font-size:11px;font-weight:800;color:#3344aa;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.crop-section-lbl{font-size:10px;font-weight:700;color:#556;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
-.crop-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:8px}
-.cpb{padding:5px 2px;border-radius:5px;border:1.5px solid #c0ccf0;background:white;cursor:pointer;font-size:9px;font-weight:700;color:#3344aa;text-align:center;font-family:'Sarabun',sans-serif;transition:all .12s}
-.cpb:hover{background:#e8ecff}
-.cpb.on{background:#3344aa;color:white;border-color:#3344aa}
-.zoom-row{display:flex;align-items:center;gap:8px;padding:6px 0}
-.zoom-ic{font-size:12px;flex-shrink:0}
-.zoom-slider{flex:1;height:4px;cursor:pointer;accent-color:#3344aa}
-.zoom-val{font-size:10.5px;font-weight:700;color:#3344aa;width:34px;text-align:right;flex-shrink:0}
-.crop-reset{width:100%;padding:4px;border-radius:5px;border:1px solid #c0ccf0;background:white;cursor:pointer;font-size:10px;font-weight:700;color:#3344aa;font-family:'Sarabun',sans-serif;margin-top:2px}
-.crop-reset:hover{background:#e8ecff}
-
+.crop-ttl{font-size:10.5px;font-weight:700;color:#6D28D9;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.crop-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.cpb{padding:4px 2px;border-radius:4px;border:1.5px solid #d8ccf8;background:white;cursor:pointer;font-size:9px;font-weight:700;color:#6b46c1;text-align:center;font-family:'Sarabun',sans-serif}
+.cpb.on{background:#6D28D9;color:white;border-color:#6D28D9}
 .lay-wrap{margin-bottom:7px}.lay-t{font-size:10.5px;font-weight:700;color:#444;margin-bottom:4px}
 .lay-opts{display:flex;flex-wrap:wrap;gap:4px}
 .lo{border:2px solid #C8DDD5;border-radius:5px;padding:3px 8px;cursor:pointer;background:white;font-size:10px;font-weight:700;color:#444;transition:all 0.15s}
@@ -146,15 +190,14 @@ textarea{line-height:1.65}
 .thumbs{display:grid;gap:4px;margin-bottom:7px}
 .thumb{position:relative;border-radius:6px;overflow:hidden;background:#d0e4d8;cursor:grab;border:2px solid transparent;user-select:none}
 .thumb.drag-src{opacity:0.4;border-color:var(--c2);border-style:dashed}
-/* Thumb image container with overflow hidden for zoom */
-.thumb-img-wrap{position:relative;width:100%;height:60px;overflow:hidden}
-.thumb-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;transform-origin:center center}
+.thumb img{width:100%;height:58px;object-fit:cover;display:block;pointer-events:none}
 .thumb-rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:white;border:none;border-radius:50%;width:17px;height:17px;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;font-weight:700}
 .thumb:hover .thumb-rm{display:flex}
 .thumb-n{position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.5);color:white;font-size:8px;font-weight:700;padding:1px 4px;border-radius:2px}
-.thumb-cp{position:absolute;bottom:2px;right:2px;background:rgba(51,68,170,0.85);color:white;border:none;border-radius:3px;padding:1px 6px;font-size:8px;cursor:pointer;display:none;font-family:'Sarabun',sans-serif;font-weight:700}
+.thumb-cp{position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:3px;padding:1px 5px;font-size:8px;cursor:pointer;display:none;font-family:'Sarabun',sans-serif}
 .thumb:hover .thumb-cp{display:block}
 .clear-btn{width:100%;padding:5px;border-radius:6px;background:#fff0f0;border:1px solid #fcc;color:#C0392B;font-family:'Sarabun',sans-serif;font-weight:700;font-size:11.5px;cursor:pointer}
+
 /* THEME */
 .theme-search{width:100%;padding:7px 10px;border:1.5px solid #C8DDD5;border-radius:7px;font-family:'Sarabun',sans-serif;font-size:13px;margin-bottom:8px}
 .theme-family{margin-bottom:12px}
@@ -167,7 +210,8 @@ textarea{line-height:1.65}
 .thm-sw{width:28px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,0.1)}
 .thm-nm{font-size:8.5px;font-weight:700;color:#555;text-align:center;line-height:1.2}
 .thm.on .thm-nm{color:var(--c1)}
-/* DRAFTS */
+
+/* DRAFTS/EXPORT */
 .slots{display:flex;flex-direction:column;gap:7px}
 .slot{border:1.5px solid #C8DDD5;border-radius:8px;padding:9px 11px;background:#fafafa}
 .slot.full{background:var(--c5);border-color:var(--c4)}
@@ -191,8 +235,13 @@ textarea{line-height:1.65}
 .st-row:last-child{border-bottom:none}
 .stdt{width:7px;height:7px;border-radius:50%;background:#ddd;flex-shrink:0}
 .stdt.ok{background:#4caf50}.stdt.warn{background:#ff9800}.stdt.bad{background:#C0392B}
-/* RIGHT PANEL */
-.panel-r{flex:1;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:12px 16px;background:#E5EAE7;gap:9px;-webkit-overflow-scrolling:touch;min-width:0}
+
+/* ══════════ RIGHT PANEL ══════════ */
+.panel-r{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:12px 16px;background:#E5EAE7;gap:9px;
+  -webkit-overflow-scrolling:touch;min-width:0;
+}
 .prev-row{width:100%;max-width:820px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px;flex-wrap:wrap}
 .prev-lbl{font-size:10.5px;font-weight:700;color:#888;letter-spacing:0.8px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
 .live-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;animation:pulse 2s infinite;flex-shrink:0}
@@ -202,8 +251,11 @@ textarea{line-height:1.65}
 .zm-btn{width:22px;height:22px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:700;color:#555;display:flex;align-items:center;justify-content:center;border-radius:3px;-webkit-tap-highlight-color:transparent}
 .zm-btn:hover{background:var(--c5)}
 .zm-pct{font-size:10.5px;font-weight:700;color:#555;min-width:32px;text-align:center}
+
+/* Mobile toggle panel btn */
 .panel-toggle{display:none;background:var(--c1);color:white;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif}
 @media(max-width:840px){.panel-toggle{display:flex;align-items:center;gap:4px}}
+
 .prev-wrap{width:100%;max-width:820px;display:flex;justify-content:center;align-items:flex-start}
 .prev-scale{transform-origin:top center;transition:transform 0.25s}
 
@@ -212,15 +264,21 @@ textarea{line-height:1.65}
 ══════════════════════════════════ */
 .onepage{
   width:794px;min-height:1123px;height:1123px;
-  background:white;box-shadow:0 4px 28px rgba(0,0,0,0.2);
+  background:white;
+  box-shadow:0 4px 28px rgba(0,0,0,0.2);
   font-family:'Sarabun',sans-serif;
   display:flex;flex-direction:column;overflow:hidden;
+  /* CSS size vars */
   --fs-badge:20px;--fs-org:14px;--fs-title:24px;--fs-body:13.5px;
   --fs-name:14px;--fs-pos:12px;--fs-date:13px;--fs-label:12px;--fs-footer:12.5px;
   --ph-scale:1;--ph-mg:0px;--line-body:1.9;
   --flogo-size:48px;--flogo-pos:center;
 }
+
+/* TOP STRIP */
 .op-st{height:8px;background:linear-gradient(90deg,var(--c1),var(--c3) 60%,var(--gold));flex-shrink:0}
+
+/* ── HEADER 140px ── */
 .op-hdr{flex-shrink:0;height:140px;background:white;border-bottom:3px solid var(--c1);display:flex;align-items:stretch;padding:10px 20px;gap:12px}
 .op-hl{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
 .op-logo{height:108px;width:108px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
@@ -230,40 +288,79 @@ textarea{line-height:1.65}
 .op-badge{display:inline-block;background:var(--c1);color:white;font-family:'Prompt',sans-serif;font-size:var(--fs-badge);font-weight:800;padding:4px 16px;border-radius:4px;margin-bottom:5px;line-height:1.3}
 .op-org{font-size:var(--fs-org);font-weight:600;color:#3D3D3D;line-height:1.4}
 .op-unit{font-size:calc(var(--fs-org)*0.88);color:#777}
-/* ★ FIX: officer always ROW layout ★ */
-.op-hr{display:flex;flex-direction:row;align-items:flex-end;flex-shrink:0;gap:11px;padding-bottom:6px}
-.op-officer{flex-shrink:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;height:112px}
-.op-officer img{height:112px;width:auto;max-width:92px;object-fit:contain;display:block}
+
+/* ── OFFICER: row layout, photo LEFT of name, no shadow, no frame ── */
+.op-hr{
+  display:flex;flex-direction:row;
+  align-items:flex-end;
+  flex-shrink:0;gap:11px;padding-bottom:6px;
+}
+.op-officer{
+  flex-shrink:0;overflow:hidden;
+  display:flex;align-items:flex-end;justify-content:center;
+  height:112px;
+}
+.op-officer img{
+  height:112px;width:auto;max-width:92px;
+  object-fit:contain;
+  display:block;
+  /* no shadow, no border — plain PNG */
+}
 .op-officer-ph{font-size:44px;color:#d0d0d0;align-self:center}
 .op-off-info{text-align:right}
 .op-off-name{font-size:var(--fs-name);font-weight:800;color:var(--c1);line-height:1.3;white-space:nowrap}
 .op-off-pos{font-size:var(--fs-pos);color:#555;font-weight:500;margin-bottom:3px;white-space:nowrap}
 .op-date-chip{display:inline-block;background:var(--c1);color:white;font-size:var(--fs-date);font-weight:700;padding:3px 12px;border-radius:4px}
+
+/* TITLE BAND */
 .op-title-band{flex-shrink:0;min-height:58px;background:linear-gradient(135deg,var(--c5),#f8fef9);border-bottom:2px solid var(--c4);padding:11px 20px;display:flex;align-items:center;justify-content:center}
 .op-title{font-family:'Prompt',sans-serif;font-size:var(--fs-title);font-weight:800;color:var(--c1);line-height:1.3;text-align:center}
 .op-title-ph{color:#c0c0c0;font-style:italic;font-size:calc(var(--fs-title)*0.78);font-weight:400}
+
+/* PHOTOS */
 .op-photos{flex-shrink:0;overflow:hidden;width:100%;padding:0 var(--ph-mg)}
 .op-photos-bg{background:#e0ece4;overflow:hidden}
 .op-photos-empty{height:80px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#bbb;font-style:italic;background:#f5f5f5}
+
+/* BODY */
 .op-body-sec{flex:1;padding:10px 20px 8px;overflow:hidden;display:flex;flex-direction:column;gap:0}
 .op-sec{margin-bottom:0}
 .op-sec-lbl{font-size:var(--fs-label);font-weight:800;color:var(--c1);letter-spacing:0.5px;text-transform:uppercase;display:flex;align-items:center;gap:5px;margin-bottom:5px}
 .op-sec-lbl::before{content:'';width:3px;height:13px;background:var(--c1);border-radius:2px;flex-shrink:0}
 .op-sec-lbl::after{content:'';flex:1;height:1px;background:var(--c4)}
 .op-txt{font-size:var(--fs-body);line-height:var(--line-body);color:#3D3D3D;text-align:justify}
+/* paragraph indent + spacing */
 .op-txt p{text-indent:2em;margin-bottom:5px;word-break:break-word;overflow-wrap:break-word}
 .op-txt p:last-child{margin-bottom:0}
 .op-txt-ph{color:#c0c0c0;font-style:italic;font-size:calc(var(--fs-body)*0.9);text-indent:0!important}
-.op-footer-logos{flex-shrink:0;padding:7px 20px;min-height:calc(var(--flogo-size) + 14px);display:flex;align-items:center;justify-content:var(--flogo-pos);gap:12px;background:white;border-top:1px solid var(--c4)}
+
+/* FOOTER LOGOS AREA */
+.op-footer-logos{
+  flex-shrink:0;padding:7px 20px;
+  min-height:calc(var(--flogo-size) + 14px);
+  display:flex;align-items:center;
+  justify-content:var(--flogo-pos);
+  gap:12px;
+  background:white;
+  border-top:1px solid var(--c4);
+}
 .op-footer-logos.empty{background:#fafafa;justify-content:center}
-.op-footer-logo{height:var(--flogo-size);width:auto;object-fit:contain;display:block;max-width:120px}
+.op-footer-logo{
+  height:var(--flogo-size);width:auto;
+  object-fit:contain;display:block;
+  max-width:120px;
+}
 .op-footer-logos-ph{font-size:11px;color:#ccc;font-style:italic}
+
+/* FOOTER BAR */
 .op-footer{flex-shrink:0;height:40px;background:var(--c1);padding:0 20px;display:flex;align-items:center;justify-content:space-between}
 .op-fp{font-size:var(--fs-footer);color:white;font-weight:700;display:flex;align-items:center;gap:4px}
 .op-fo{font-size:calc(var(--fs-footer)*0.88);color:rgba(255,255,255,0.75)}
+
+/* BOTTOM STRIP */
 .op-sb{flex-shrink:0;height:5px;background:linear-gradient(90deg,var(--gold),var(--c3),var(--c1))}
 
-/* ★ PHOTO GRIDS — image container supports zoom ★ */
+/* ── PHOTO GRIDS (A4-proportioned) ── */
 .photo-grid{display:grid;gap:2px;width:100%}
 .pg-1{grid-template-columns:1fr}.pg-1 .pi{height:calc(var(--ph-scale)*360px)}
 .pg-2{grid-template-columns:1fr 1fr}.pg-2 .pi{height:calc(var(--ph-scale)*265px)}
@@ -279,17 +376,14 @@ textarea{line-height:1.65}
 .pg-7{grid-template-columns:repeat(3,1fr)}.pg-7 .pi{height:calc(var(--ph-scale)*142px)}
 .pg-8{grid-template-columns:repeat(4,1fr)}.pg-8 .pi{height:calc(var(--ph-scale)*135px)}
 .pg-8b{grid-template-columns:1fr 1fr}.pg-8b .pi{height:calc(var(--ph-scale)*135px)}
-.pi{overflow:hidden;background:#c0d8c8;position:relative}
-/* ★ FIX: image uses object-fit:cover + transform for zoom — no distortion ★ */
-.pi img{
-  width:100%;height:100%;
-  object-fit:cover;
-  display:block;
-  transition:transform 0.2s, object-position 0.2s;
-}
+.pi{overflow:hidden;background:#c0d8c8}
+.pi img{width:100%;height:100%;object-fit:cover;display:block;transition:object-position 0.3s}
 .pi-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;color:#aaa;font-size:10px;background:#eff5f1}
 
+/* SCROLLBAR */
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+
+/* MODAL */
 .mod-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;align-items:center;justify-content:center}
 .mod-bg.show{display:flex}
 .mod{background:white;border-radius:13px;padding:20px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);margin:0 16px}
@@ -298,22 +392,55 @@ textarea{line-height:1.65}
 .mod-acts{display:flex;gap:7px;justify-content:flex-end}
 .mbtn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'Sarabun',sans-serif;font-size:12.5px;font-weight:700}
 .mbtn-c{background:#f0f0f0;color:#444}.mbtn-ok{background:var(--c1);color:white}
+
+/* ══════════ PRINT ══════════ */
+
+/* ═══ MOBILE TOUCH FIXES ═══ */
+button, [onclick], .tyb, .thm, .lo, .thumb, .flogo-slot, .dropzone,
+.slb, .fill-btn, .ai-btn, .exp-btn, .exp-opt-btn, .ubtn, .cpb {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer !important;
+}
+/* Min tap target 44px for accessibility on mobile */
+.tab { min-height: 44px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.btn { min-height: 36px; }
+.slb, .ubtn { min-height: 32px; }
+/* Fix iOS rubber-band scroll */
+.app { position: fixed; width: 100%; }
+/* Make select usable on mobile */
+select { font-size: 16px !important; touch-action: manipulation; }
+/* Prevent zoom on focus iOS */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select, textarea, input { font-size: 16px !important; }
+}
+
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}
   html,body{background:white!important;height:auto!important;overflow:visible!important;margin:0!important;padding:0!important}
   .app{display:block!important;height:auto!important;overflow:visible!important}
+  /* Hide all UI */
   .topbar,.panel-l,.prev-row,.panel-overlay,.mod-bg{display:none!important}
+  /* Show only preview panel as block */
   .workspace{display:block!important;overflow:visible!important}
   .panel-r{display:block!important;padding:0!important;background:white!important;overflow:visible!important;height:auto!important;min-height:0!important}
   .prev-wrap{display:block!important;max-width:100%!important;width:100%!important}
+  /* Reset zoom transform → actual A4 size */
   .prev-scale{transform:none!important;width:210mm!important;display:block!important}
-  .onepage{width:210mm!important;height:297mm!important;min-height:297mm!important;box-shadow:none!important;border:none!important;border-radius:0!important;page-break-inside:avoid!important}
+  /* A4 onepage */
+  .onepage{
+    width:210mm!important;height:297mm!important;min-height:297mm!important;
+    box-shadow:none!important;border:none!important;border-radius:0!important;
+    page-break-inside:avoid!important;
+  }
   @page{margin:0;size:A4 portrait}
 }
 </style>
 </head>
 <body>
 <div class="app" id="app">
+
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="tb-l">
     <div class="tb-logo">🏥</div>
@@ -326,13 +453,15 @@ textarea{line-height:1.65}
     <div class="si" id="save-ind"><div class="sdot"></div><span>บันทึกแล้ว</span></div>
     <button class="btn btn-o" onclick="showMod('reset')">🔄</button>
     <button class="btn btn-w" onclick="openExportModal()">📤 Export</button>
-    <button class="btn btn-ai" onclick="genAI()">✨ Claude AI</button>
+    <button class="btn btn-ai" onclick="genAI()">🤖 AI</button>
   </div>
 </div>
 
 <div class="workspace" id="workspace">
+  <!-- overlay for mobile -->
   <div class="panel-overlay" id="panel-overlay" onclick="togglePanel(false)"></div>
 
+  <!-- LEFT PANEL -->
   <div class="panel-l" id="panel-l">
     <div class="tabs">
       <button class="tab active" onclick="sw('data',this)">📝 ข้อมูล</button>
@@ -342,11 +471,13 @@ textarea{line-height:1.65}
       <button class="tab" onclick="sw('drafts',this)">📂 ร่าง</button>
       <button class="tab" onclick="sw('export',this)">📤 ออก</button>
     </div>
+
     <div class="pb">
 
-    <!-- DATA TAB -->
+    <!-- ── DATA TAB ── -->
     <div class="ps active" id="tab-data">
       <div class="prog"><div class="prog-l"><span>ความสมบูรณ์</span><span id="prog-pct">0%</span></div><div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div></div>
+
       <div class="shdr">โลโก้หน่วยงาน</div>
       <div class="logo-area">
         <div class="logo-prev" id="logo-prev" onclick="document.getElementById('logo-file').click()">
@@ -356,7 +487,7 @@ textarea{line-height:1.65}
           <div class="up-btn" onclick="document.getElementById('logo-file').click()">📸 อัปโหลดโลโก้</div>
           <div class="up-hint">โลโก้กระทรวงสาธารณสุข แสดง Header ซ้าย</div>
           <div class="mem-badge" id="logo-mem">💾 จำโลโก้ไว้แล้ว</div>
-          <div id="logo-ctrl" style="display:none;margin-top:4px;gap:8px">
+          <div id="logo-ctrl" style="display:none;margin-top:4px;gap:8px;display:none">
             <span style="font-size:10.5px;color:#C0392B;cursor:pointer;font-weight:700" onclick="clearLogo()">✕ ลบ</span>&nbsp;&nbsp;
             <span style="font-size:10.5px;color:var(--c2);cursor:pointer;font-weight:700" onclick="saveLogo()">💾 จำโลโก้</span>
           </div>
@@ -371,9 +502,9 @@ textarea{line-height:1.65}
         </div>
         <div>
           <div class="up-btn" onclick="document.getElementById('officer-file').click()">📸 อัปโหลดรูปหัวหน้า</div>
-          <div class="up-hint">วางข้างซ้ายของชื่อ Header ขวา<br>แนะนำ PNG พื้นหลังโปร่งใส</div>
+          <div class="up-hint">ไม่มีกรอบ วางแบบ PNG<br>อยู่ข้างซ้ายของชื่อ Header ขวา<br>แนะนำ PNG พื้นหลังโปร่งใส</div>
           <div class="mem-badge" id="officer-mem">💾 จำรูปสสอ.แล้ว</div>
-          <div id="officer-ctrl" style="display:none;margin-top:4px">
+          <div id="officer-ctrl" style="display:none;margin-top:4px;display:none">
             <span style="font-size:10.5px;color:#C0392B;cursor:pointer;font-weight:700" onclick="clearOfficer()">✕ ลบ</span>&nbsp;&nbsp;
             <span style="font-size:10.5px;color:var(--c2);cursor:pointer;font-weight:700" onclick="saveOfficer()">💾 จำรูปสสอ.</span>
           </div>
@@ -391,13 +522,15 @@ textarea{line-height:1.65}
       </div>
       <div class="field"><div class="fl">วันที่ <span class="req">จำเป็น</span></div><input type="date" id="f-date" oninput="ua();as()"></div>
       <div class="field"><div class="fl">หัวข้อกิจกรรม <span class="req">จำเป็น</span></div><input type="text" id="f-title" placeholder="เช่น ประชุม ชี้แจงการดำเนินงาน..." oninput="ua();as()"></div>
-      <div class="field" id="fld-as" style="display:none"><div class="fl">ผู้รับมอบหมาย <span class="opt">ใช้ template</span></div><input type="text" id="f-assignee" placeholder="นายชยานันต์ จันทร์คำ  นักวิชาการสาธารณสุข" oninput="as()"></div>
+      <div class="field" id="fld-as" style="display:none"><div class="fl">ผู้รับมอบหมาย <span class="opt">ใช้ template</span></div><input type="text" id="f-assignee" placeholder="นายปิยะณัฐ ทองโกย นักวิชาการสาธารณสุขปฏิบัติการ" oninput="as()"></div>
       <div class="field"><div class="fl">สถานที่จัด <span class="opt">ใช้ template</span></div><input type="text" id="f-venue" placeholder="ห้องประชุมพ่อขุนผาเมือง สสจ.พช." oninput="as()"></div>
+
       <div id="tmpl-a" class="tmpl"><strong>สูตร A:</strong> <span class="sl">วันที่</span> นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ <span class="sl">ได้ดำเนินการจัด</span> <span class="sl">กิจกรรม</span> เพื่อ<span class="sl">วัตถุประสงค์</span> ณ <span class="sl">สถานที่</span></div>
       <div id="tmpl-b" class="tmpl" style="display:none"><strong>สูตร B:</strong> <span class="sl">วันที่</span> นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ มอบหมายให้ <span class="sl">ชื่อ-ตำแหน่ง</span> เข้าร่วม<span class="sl">กิจกรรม</span> เพื่อ<span class="sl">วัตถุประสงค์</span> ณ <span class="sl">สถานที่</span></div>
+
       <div class="field">
         <div class="fl">เนื้อหา + รายละเอียด <span class="req">จำเป็น</span></div>
-        <div class="fh">รวมทุกอย่างในช่องเดียว — Enter แยกย่อหน้า</div>
+        <div class="fh">รวมทุกอย่างในช่องเดียว — Enter แยกย่อหน้า — มีย่อหน้านำอัตโนมัติ</div>
         <div class="undo-row">
           <button class="ubtn" id="undo-btn" onclick="doUndo()" disabled>↩ ย้อน</button>
           <button class="ubtn" id="redo-btn" onclick="doRedo()" disabled>↪ ซ้ำ</button>
@@ -405,9 +538,10 @@ textarea{line-height:1.65}
         <textarea id="f-body" rows="8" placeholder="วันที่... นางกานพ์ดารัตน์ พลับพลา...&#10;&#10;วัตถุประสงค์:...&#10;&#10;ผลการดำเนินงาน:..." oninput="ua();as();updateCC();pushUndo()"></textarea>
         <div class="cc" id="char-ct">0 ตัวอักษร</div>
         <button class="fill-btn" onclick="fillTpl()">✨ เติม Template</button>
-        <button class="ai-btn" id="ai-btn" onclick="genAI()">✨ Claude AI เขียนให้เลย</button>
-        <div class="ai-spin" id="ai-spin"><span class="spin">⚙️</span> Claude กำลังเขียน...</div>
+        <button class="ai-btn" id="ai-btn" onclick="genAI()">🤖 ให้ AI เขียนให้เลย</button>
+        <div class="ai-spin" id="ai-spin"><span class="spin">⚙️</span> AI กำลังเขียน...</div>
       </div>
+
       <div class="shdr">Logo/Banner ท้ายหน้า</div>
       <div class="fh" style="margin-bottom:6px">อัปโหลดโลโก้หน่วยงานพันธมิตร สูงสุด 3 รูป (ปรับขนาดในเมนู ⚙️)</div>
       <div class="footer-logos-area" id="footer-logos-area">
@@ -417,13 +551,11 @@ textarea{line-height:1.65}
         <div style="font-size:10px;color:#888;align-self:center;margin-left:4px">คลิกช่องเพื่ออัปโหลด</div>
       </div>
       <input type="file" id="flogo-file" accept="image/*" style="display:none" onchange="onFooterLogo(event)">
-    </div>
+    </div><!-- /tab-data -->
 
-    <!-- PHOTOS TAB -->
+    <!-- ── PHOTOS TAB ── -->
     <div class="ps" id="tab-photos">
-      <div style="background:#e8f4e8;border:1px solid #b0d8b0;border-left:3px solid var(--c2);border-radius:6px;padding:7px 10px;margin-bottom:8px;font-size:10.5px;color:#1a4a1a;line-height:1.6">
-        💡 ลากรูปวาง • ลากเรียงลำดับ • กด <strong>Crop/Zoom</strong> เพื่อจัดระยะและซูมแต่ละรูป
-      </div>
+      <div style="background:#fdf8e1;border:1px solid #e8d5a0;border-left:3px solid #B8860B;border-radius:6px;padding:7px 10px;margin-bottom:8px;font-size:10.5px;color:#5a4000;line-height:1.6">💡 ลากรูปวาง • ลากเรียงได้ • กด Crop ปรับโฟกัส</div>
       <div class="dropzone" id="dropzone" onclick="document.getElementById('file-in').click()" ondragover="oDV(event)" ondragleave="oDL(event)" ondrop="oDrop(event)">
         <div class="dz-ic">📸</div><div class="dz-tx">คลิกหรือลากรูปวาง</div>
         <div class="dz-sub">JPG, PNG, WEBP • สูงสุด 8 รูป</div>
@@ -431,30 +563,16 @@ textarea{line-height:1.65}
       </div>
       <input type="file" id="file-in" accept="image/*" multiple style="display:none" onchange="onFileIn(event)">
       <div class="ph-info"><div class="ph-badge">📷 <span id="ph-ct">0 รูป</span></div><div class="lay-lbl" id="lay-lbl">—</div></div>
-
-      <!-- ★ IMPROVED CROP PANEL ★ -->
       <div class="crop-panel" id="crop-panel">
-        <div class="crop-ttl">
-          <span>📐 Crop &amp; Zoom — รูปที่ <span id="crop-num">1</span></span>
-          <button style="border:none;background:none;cursor:pointer;font-size:11px;color:#888" onclick="closeCrop()">✕ ปิด</button>
-        </div>
-        <div class="crop-section-lbl">จุดโฟกัส (9 ทิศ)</div>
+        <div class="crop-ttl"><span>📐 Crop รูปที่ <span id="crop-num">1</span></span><button style="border:none;background:none;cursor:pointer;font-size:11px" onclick="closeCrop()">✕</button></div>
         <div class="crop-g" id="crop-g"></div>
-        <div class="crop-section-lbl">ซูม / ขยาย</div>
-        <div class="zoom-row">
-          <span class="zoom-ic">🔍</span>
-          <input type="range" class="zoom-slider" id="crop-zoom-slider" min="100" max="300" value="100" oninput="setCropZoom(this.value)">
-          <span class="zoom-val" id="crop-zoom-val">1.0×</span>
-        </div>
-        <button class="crop-reset" onclick="resetCrop()">🔄 รีเซ็ต Crop &amp; Zoom</button>
       </div>
-
       <div id="lay-wrap" style="display:none" class="lay-wrap"><div class="lay-t">Layout:</div><div class="lay-opts" id="lay-opts"></div></div>
       <div class="thumbs" id="thumbs"></div>
       <button class="clear-btn" id="clear-btn" style="display:none" onclick="showMod('clear-photos')">🗑️ ลบรูปทั้งหมด</button>
-    </div>
+    </div><!-- /tab-photos -->
 
-    <!-- SIZE TAB -->
+    <!-- ── SIZE TAB ── -->
     <div class="ps" id="tab-size">
       <div style="font-size:11px;color:#444;background:var(--c5);border-radius:7px;padding:9px 11px;margin-bottom:11px;border:1px solid var(--c4);line-height:1.6">⚙️ ปรับขนาด — Preview อัปเดตทันที</div>
       <div class="size-group">
@@ -478,7 +596,7 @@ textarea{line-height:1.65}
         <div class="s-row"><div class="s-lbl">ขอบข้าง</div><input type="range" class="s-slider" min="0" max="50" value="0" id="ph-mg" oninput="sPhMg(this.value)"><div class="s-val" id="phmg-v">0px</div></div>
       </div>
       <div class="size-group">
-        <div class="sg-title">🏷️ Logo ท้ายหน้า</div>
+        <div class="sg-title">🏷️ Logo ท้ายหน้า (ปรับแยกแต่ละโลโก้)</div>
         <div style="font-size:10px;color:#888;margin-bottom:7px">— โลโก้ 1 —</div>
         <div class="s-row"><div class="s-lbl">ขนาดโลโก้ 1</div><input type="range" class="s-slider" min="24" max="160" value="48" id="flogo-size-0" oninput="sFLogoSizeN(0,this.value)"><div class="s-val" id="fls-v-0">48px</div></div>
         <div style="font-size:10px;color:#888;margin:5px 0 7px">— โลโก้ 2 —</div>
@@ -496,21 +614,21 @@ textarea{line-height:1.65}
         </div>
       </div>
       <button style="width:100%;padding:8px;border-radius:7px;background:#f5f5f5;border:1px solid #ddd;color:#555;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="resetSizes()">🔄 รีเซ็ตขนาดทั้งหมด</button>
-    </div>
+    </div><!-- /tab-size -->
 
-    <!-- THEME TAB -->
+    <!-- ── THEME TAB ── -->
     <div class="ps" id="tab-theme">
       <input class="theme-search" type="text" placeholder="🔍 ค้นหาธีม..." oninput="filterThemes(this.value)">
       <div id="theme-container"></div>
     </div>
 
-    <!-- DRAFTS TAB -->
+    <!-- ── DRAFTS TAB ── -->
     <div class="ps" id="tab-drafts">
       <div style="font-size:11px;color:#444;background:var(--c5);border-radius:7px;padding:9px 11px;margin-bottom:11px;border:1px solid var(--c4)">💾 บันทึกได้ 3 ร่าง • รูปไม่ได้บันทึก</div>
       <div class="slots" id="slots"></div>
     </div>
 
-    <!-- EXPORT TAB -->
+    <!-- ── EXPORT TAB ── -->
     <div class="ps" id="tab-export">
       <div class="exp-g">
         <div class="exp-t">📤 Export ไฟล์</div>
@@ -550,10 +668,13 @@ textarea{line-height:1.65}
         <button class="btn btn-g" onclick="openExportModal()">📤 Export</button>
       </div>
     </div>
+
     <div class="prev-wrap" id="prev-wrap">
       <div class="prev-scale" id="prev-scale">
         <div class="onepage" id="onepage">
           <div class="op-st"></div>
+
+          <!-- HEADER -->
           <div class="op-hdr">
             <div class="op-hl">
               <div class="op-logo" id="prev-logo" onclick="document.getElementById('logo-file').click()" title="คลิกอัปโหลดโลโก้">
@@ -566,6 +687,7 @@ textarea{line-height:1.65}
                 <div class="op-unit">จังหวัดเพชรบูรณ์</div>
               </div>
             </div>
+            <!-- Officer: ABOVE name, NO frame -->
             <div class="op-hr">
               <div class="op-officer" id="prev-officer" onclick="document.getElementById('officer-file').click()" title="คลิกอัปโหลดรูป">
                 <div class="op-officer-ph" id="prev-officer-ph">👤</div>
@@ -578,36 +700,45 @@ textarea{line-height:1.65}
               </div>
             </div>
           </div>
+
+          <!-- TITLE -->
           <div class="op-title-band">
             <div class="op-title" id="prev-title"><span class="op-title-ph">หัวข้อกิจกรรม...</span></div>
           </div>
+
+          <!-- PHOTOS -->
           <div class="op-photos" id="prev-photos-wrap">
             <div class="op-photos-bg" id="prev-photos">
               <div class="op-photos-empty">📷 รูปกิจกรรมจะปรากฏที่นี่</div>
             </div>
           </div>
+
+          <!-- BODY (merged) -->
           <div class="op-body-sec">
             <div class="op-sec">
               <div class="op-sec-lbl">รายงานกิจกรรม</div>
               <div class="op-txt" id="prev-body"><span class="op-txt-ph">เนื้อหาจะปรากฏที่นี่...</span></div>
             </div>
           </div>
+
+          <!-- FOOTER LOGOS -->
           <div class="op-footer-logos" id="prev-footer-logos">
             <span class="op-footer-logos-ph">[ โลโก้ท้ายหน้า ]</span>
           </div>
+
+          <!-- FOOTER BAR -->
           <div class="op-footer">
             <div class="op-fp">📞 056-728080</div>
             <div class="op-fo">สำนักงานสาธารณสุขอำเภอเขาค้อ</div>
           </div>
           <div class="op-sb"></div>
-        </div>
+        </div><!-- /onepage -->
       </div>
     </div>
-  </div>
-</div>
-</div>
+  </div><!-- /panel-r -->
+</div><!-- /workspace -->
+</div><!-- /app -->
 
-<!-- CONFIRM MODAL -->
 <div class="mod-bg" id="modal">
   <div class="mod">
     <div class="mod-t" id="mod-t">ยืนยัน</div>
@@ -623,13 +754,13 @@ textarea{line-height:1.65}
 <div class="mod-bg" id="export-modal">
   <div class="mod" style="max-width:340px">
     <div class="mod-t">📤 Export / บันทึกไฟล์</div>
-    <div style="font-size:12px;color:#666;margin-bottom:14px;line-height:1.6">เลือกรูปแบบที่ต้องการ</div>
+    <div style="font-size:12px;color:#666;margin-bottom:14px;line-height:1.6">เลือกรูปแบบที่ต้องการ — ระบบแปลง One-Page เป็นไฟล์ให้อัตโนมัติ</div>
     <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px" id="export-btns">
       <button onclick="doExport('print')" class="exp-opt-btn"><span>🖨️</span><div><div style="font-weight:700;font-size:12.5px">Print</div><div style="font-size:10.5px;color:#888">เปิด dialog พิมพ์</div></div></button>
       <button onclick="doExport('pdf')" class="exp-opt-btn"><span>📄</span><div><div style="font-weight:700;font-size:12.5px">PDF</div><div style="font-size:10.5px;color:#888">ไฟล์ PDF ขนาด A4</div></div></button>
-      <button onclick="doExport('png')" class="exp-opt-btn"><span>🖼️</span><div><div style="font-weight:700;font-size:12.5px">PNG</div><div style="font-size:10.5px;color:#888">รูปภาพคุณภาพสูง</div></div></button>
+      <button onclick="doExport('png')" class="exp-opt-btn"><span>🖼️</span><div><div style="font-weight:700;font-size:12.5px">PNG</div><div style="font-size:10.5px;color:#888">รูปภาพคุณภาพสูง พื้นขาว</div></div></button>
       <button onclick="doExport('jpg')" class="exp-opt-btn"><span>📸</span><div><div style="font-weight:700;font-size:12.5px">JPG</div><div style="font-size:10.5px;color:#888">JPEG 95% คุณภาพสูง</div></div></button>
-      <button onclick="doExport('html')" class="exp-opt-btn"><span>💾</span><div><div style="font-weight:700;font-size:12.5px">HTML</div><div style="font-size:10.5px;color:#888">เปิดได้ทุกเครื่อง</div></div></button>
+      <button onclick="doExport('html')" class="exp-opt-btn"><span>💾</span><div><div style="font-weight:700;font-size:12.5px">HTML</div><div style="font-size:10.5px;color:#888">เปิดได้ทุกเครื่อง ออฟไลน์</div></div></button>
     </div>
     <div id="export-progress" style="display:none;text-align:center;padding:10px;font-size:12.5px;color:var(--c2);font-weight:700"><span class="spin" style="display:inline-block;margin-right:6px">⚙️</span>กำลังสร้างไฟล์...</div>
     <div style="display:flex;justify-content:flex-end;margin-top:4px">
@@ -638,34 +769,48 @@ textarea{line-height:1.65}
   </div>
 </div>
 
-<!-- RESULT VIEWER -->
-<div class="mod-bg" id="result-viewer" style="z-index:9500;align-items:stretch;padding:0;display:none">
+<style>
+.exp-opt-btn{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:8px;border:1.5px solid #C8DDD5;background:white;cursor:pointer;font-family:'Sarabun',sans-serif;text-align:left;width:100%;transition:all 0.15s;font-size:14px}
+.exp-opt-btn:hover{background:var(--c5);border-color:var(--c2)}
+</style>
+
+<!-- hidden iframe for print (avoids popup blocker) -->
+<iframe id="print-frame" style="position:fixed;left:-9999px;top:0;width:210mm;height:297mm;border:none;z-index:-999" tabindex="-1"></iframe>
+
+<!-- RESULT VIEWER MODAL -->
+<div class="mod-bg" id="result-viewer" style="z-index:9500;align-items:stretch;padding:0">
   <div style="width:100%;height:100%;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;overflow:hidden">
+    <!-- Header -->
     <div style="background:#1c1c1e;color:white;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px">
       <div style="display:flex;align-items:center;gap:10px">
         <span id="result-type-badge" style="background:var(--c2);color:white;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px">PNG</span>
         <span id="result-filename" style="font-size:13px;color:#ccc;font-family:monospace"></span>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button id="result-dl-btn" style="padding:7px 16px;border-radius:7px;border:none;background:var(--c2);color:white;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12.5px;cursor:pointer">⬇️ Download</button>
-        <button onclick="document.getElementById('result-viewer').style.display='none'" style="padding:7px 14px;border-radius:7px;border:none;background:#3a3a3a;color:white;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12.5px;cursor:pointer">✕ ปิด</button>
+        <button id="result-dl-btn" style="padding:7px 16px;border-radius:7px;border:none;background:var(--c2);color:white;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px">
+          ⬇️ Download
+        </button>
+        <button onclick="document.getElementById('result-viewer').classList.remove('show')" style="padding:7px 14px;border-radius:7px;border:none;background:#3a3a3a;color:white;font-family:'Sarabun',sans-serif;font-weight:700;font-size:12.5px;cursor:pointer">
+          ✕ ปิด
+        </button>
       </div>
     </div>
+    <!-- Hint bar -->
     <div id="result-hint" style="background:#2a2a2a;color:#e0e0e0;padding:10px 16px;font-size:12px;font-family:'Sarabun',sans-serif;line-height:1.7;flex-shrink:0;border-bottom:1px solid #3a3a3a"></div>
+    <!-- Image area -->
     <div style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px;background:#111">
-      <img id="result-img" src="" alt="preview" style="max-width:100%;height:auto;box-shadow:0 4px 24px rgba(0,0,0,0.5);display:block;border-radius:4px" draggable="true">
+      <img id="result-img" src="" alt="one-page preview" style="max-width:100%;height:auto;box-shadow:0 4px 24px rgba(0,0,0,0.5);display:block;border-radius:4px" draggable="true">
     </div>
   </div>
 </div>
 
 <style>
-.exp-opt-btn{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:8px;border:1.5px solid #C8DDD5;background:white;cursor:pointer;font-family:'Sarabun',sans-serif;text-align:left;width:100%;transition:all 0.15s;font-size:14px}
-.exp-opt-btn:hover{background:var(--c5);border-color:var(--c2)}
+#result-viewer{display:none}
+#result-viewer.show{display:flex}
 </style>
-<iframe id="print-frame" style="position:fixed;left:-9999px;top:0;width:210mm;height:297mm;border:none;z-index:-999" tabindex="-1"></iframe>
 
 <script>
-// ════ 54 THEMES ════
+// ════════════ 54 THEMES ════════════
 const TF=[
   {name:'🟢 เขียว',t:[
     {id:'g1',n:'กระทรวงสาธารณสุข',c1:'#005C30',c2:'#007A40',c3:'#00A050',c4:'#D4F0E0',c5:'#EBF7F0',g:'#B8860B'},
@@ -742,43 +887,51 @@ const TF=[
 ];
 
 // ════ STATE ════
-let cType='A', photos=[], cLayout='', dragIdx=null, cropIdx=null;
-let logob64='', officerb64='', footerLogos=[null,null,null];
-let undoSt=[], redoSt=[], undoPaused=false, saveTimer=null, zoomLv=0.75;
-let cTheme='g1', flgCurSlot=0;
+let cType='A',photos=[],cLayout='',dragIdx=null,cropIdx=null;
+let logob64='',officerb64='',footerLogos=[null,null,null];
+let undoSt=[],redoSt=[],undoPaused=false,saveTimer=null,zoomLv=0.75;
+let cTheme='g1';
+let flgCurSlot=0;
 
 const CROP_POS=[
-  {id:'top left',lb:'↖ บนซ้าย'},{id:'top center',lb:'↑ บนกลาง'},{id:'top right',lb:'↗ บนขวา'},
-  {id:'center left',lb:'← กลางซ้าย'},{id:'center',lb:'⊙ กึ่งกลาง'},{id:'center right',lb:'→ กลางขวา'},
-  {id:'bottom left',lb:'↙ ล่างซ้าย'},{id:'bottom center',lb:'↓ ล่างกลาง'},{id:'bottom right',lb:'↘ ล่างขวา'},
+  {id:'top left',lb:'↖บนซ้าย'},{id:'top center',lb:'↑บนกลาง'},{id:'top right',lb:'↗บนขวา'},
+  {id:'center left',lb:'←กลางซ้าย'},{id:'center',lb:'⊙กึ่งกลาง'},{id:'center right',lb:'→กลางขวา'},
+  {id:'bottom left',lb:'↙ล่างซ้าย'},{id:'bottom center',lb:'↓ล่างกลาง'},{id:'bottom right',lb:'↘ล่างขวา'},
 ];
 
 // ════ INIT ════
 window.addEventListener('load',()=>{
   loadData(); loadLogoFromStorage(); loadOfficerFromStorage();
-  renderThemes(); renderSlots(); autoZoom(); ua(); loadSizes();
-  const st=localStorage.getItem('op8_theme'); if(st) applyTheme(st);
+  renderThemes(); renderSlots(); autoZoom(); ua();
+  loadSizes();
+  const st=localStorage.getItem('op7_theme');if(st)applyTheme(st);
 });
-window.addEventListener('resize',()=>{ if(!document.getElementById('panel-l').classList.contains('open')) autoZoom(); });
+window.addEventListener('resize',()=>{if(!document.getElementById('panel-l').classList.contains('open'))autoZoom();});
 const v=id=>(document.getElementById(id)||{}).value||'';
 
+// ════ MOBILE PANEL ════
 function togglePanel(open){
   document.getElementById('panel-l').classList.toggle('open',open);
-  document.getElementById('panel-overlay').style.display=open?'block':'none';
+  const ov=document.getElementById('panel-overlay');ov.style.display=open?'block':'none';ov.style.pointerEvents=open?'auto':'none';
 }
+
+// ════ AUTO ZOOM ════
 function autoZoom(){
   const wrap=document.getElementById('prev-wrap');
   const w=wrap?.clientWidth||800;
   const scale=Math.max(0.28,Math.min(1.2,(w-32)/794));
   setZoom(scale);
 }
+
+// ════ TAB ════
 function sw(n,btn){
   document.querySelectorAll('.ps').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+n).classList.add('active'); btn.classList.add('active');
-  if(n==='export') renderStatus();
-  if(n==='drafts') renderSlots();
+  document.getElementById('tab-'+n).classList.add('active');btn.classList.add('active');
+  if(n==='export')renderStatus();if(n==='drafts')renderSlots();
 }
+
+// ════ TYPE ════
 function setType(t){
   cType=t;
   document.getElementById('ta').classList.toggle('on',t==='A');
@@ -794,11 +947,13 @@ function sFSbody(val){document.getElementById('onepage').style.setProperty('--fs
 function sLH(val){const lh=(val/100).toFixed(2);document.getElementById('onepage').style.setProperty('--line-body',lh);document.getElementById('lhv').textContent=lh;saveSizes();}
 function sPhScale(val){document.getElementById('onepage').style.setProperty('--ph-scale',val/100);document.getElementById('phs-v').textContent=val+'%';saveSizes();ua();}
 function sPhMg(val){document.getElementById('onepage').style.setProperty('--ph-mg',val+'px');document.getElementById('phmg-v').textContent=val+'px';saveSizes();}
+function sFLogoSize(val){sFLogoSizeN(0,val);sFLogoSizeN(1,val);sFLogoSizeN(2,val);}// legacy
 function sFLogoSizeN(idx,val){
   document.getElementById(`fls-v-${idx}`).textContent=val+'px';
-  renderFooterLogosPreview(); saveSizes();
+  renderFooterLogosPreview();saveSizes();
 }
 function sFLogoPos(val){document.getElementById('onepage').style.setProperty('--flogo-pos',val);saveSizes();}
+
 function resetSizes(){
   const defs={['fs-badge']:20,['fs-org']:14,['fs-name']:14,['fs-date']:13,['fs-title']:24,['fs-label']:12,['fs-body']:13,['fs-footer']:12,['line-h']:190,['ph-scale']:100,['ph-mg']:0,['flogo-size-0']:48,['flogo-size-1']:48,['flogo-size-2']:48};
   Object.entries(defs).forEach(([k,dv])=>{const el=document.getElementById(k);if(el)el.value=dv;});
@@ -806,18 +961,19 @@ function resetSizes(){
   sFS('--fs-date',13,'fdv','px');sFS('--fs-title',24,'ftv','px');sFS('--fs-label',12,'flv','px');
   sFSbody(13);sLH(190);sFS('--fs-footer',12,'ffv','px');sPhScale(100);sPhMg(0);
   [0,1,2].forEach(i=>{const lbl=document.getElementById(`fls-v-${i}`);if(lbl)lbl.textContent='48px';});
-  document.getElementById('flogo-pos').value='center'; sFLogoPos('center');
-  renderFooterLogosPreview(); toast('🔄 รีเซ็ตขนาดแล้ว');
+  document.getElementById('flogo-pos').value='center';sFLogoPos('center');
+  renderFooterLogosPreview();
+  toast('🔄 รีเซ็ตขนาดแล้ว');
 }
 function saveSizes(){
   const ks=['fs-badge','fs-org','fs-name','fs-date','fs-title','fs-label','fs-body','fs-footer','line-h','ph-scale','ph-mg','flogo-size-0','flogo-size-1','flogo-size-2'];
-  const s={}; ks.forEach(k=>{const el=document.getElementById(k);if(el)s[k]=el.value;});
+  const s={};ks.forEach(k=>{const el=document.getElementById(k);if(el)s[k]=el.value;});
   s.flogo_pos=document.getElementById('flogo-pos')?.value||'center';
-  try{localStorage.setItem('op8_sizes',JSON.stringify(s));}catch(e){}
+  try{localStorage.setItem('op7_sizes',JSON.stringify(s));}catch(e){}
 }
 function loadSizes(){
   try{
-    const s=JSON.parse(localStorage.getItem('op8_sizes')||'{}');
+    const s=JSON.parse(localStorage.getItem('op7_sizes')||'{}');
     if(s['fs-badge']){document.getElementById('fs-badge').value=s['fs-badge'];sFS('--fs-badge',s['fs-badge'],'fbv','px');}
     if(s['fs-org']){document.getElementById('fs-org').value=s['fs-org'];sFS('--fs-org',s['fs-org'],'fov','px');}
     if(s['fs-name']){document.getElementById('fs-name').value=s['fs-name'];sFS('--fs-name',s['fs-name'],'fnv','px');}
@@ -829,9 +985,13 @@ function loadSizes(){
     if(s['line-h']){document.getElementById('line-h').value=s['line-h'];sLH(s['line-h']);}
     if(s['ph-scale']){document.getElementById('ph-scale').value=s['ph-scale'];sPhScale(s['ph-scale']);}
     if(s['ph-mg']){document.getElementById('ph-mg').value=s['ph-mg'];sPhMg(s['ph-mg']);}
+    // per-logo sizes
     [0,1,2].forEach(i=>{
       const k=`flogo-size-${i}`;
-      if(s[k]){const el=document.getElementById(k);if(el)el.value=s[k];const lbl=document.getElementById(`fls-v-${i}`);if(lbl)lbl.textContent=s[k]+'px';}
+      if(s[k]){
+        const el=document.getElementById(k);if(el)el.value=s[k];
+        const lbl=document.getElementById(`fls-v-${i}`);if(lbl)lbl.textContent=s[k]+'px';
+      }
     });
     if(s.flogo_pos){document.getElementById('flogo-pos').value=s.flogo_pos;sFLogoPos(s.flogo_pos);}
     renderFooterLogosPreview();
@@ -860,48 +1020,51 @@ function filterThemes(q){
   });
 }
 function applyTheme(id){
-  let t=null; TF.forEach(f=>{f.t.forEach(th=>{if(th.id===id)t=th;});}); if(!t)return;
+  let t=null;TF.forEach(f=>{f.t.forEach(th=>{if(th.id===id)t=th;});});if(!t)return;
   cTheme=id;
   const r=document.documentElement.style;
   r.setProperty('--c1',t.c1);r.setProperty('--c2',t.c2);r.setProperty('--c3',t.c3);
   r.setProperty('--c4',t.c4);r.setProperty('--c5',t.c5);r.setProperty('--gold',t.g);
   document.querySelectorAll('.thm').forEach(el=>el.classList.toggle('on',el.title===t.n));
-  try{localStorage.setItem('op8_theme',id);}catch(e){}
+  try{localStorage.setItem('op7_theme',id);}catch(e){}
   toast('🎨 '+t.n);
 }
 
 // ════ LOGO ════
 function onLogo(e){
-  const f=e.target.files[0]; if(!f)return;
+  const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=ev=>{logob64=ev.target.result;setLogoUI(logob64);toast('📸 อัปโหลดโลโก้แล้ว');};
-  r.readAsDataURL(f); e.target.value='';
+  r.onload=ev=>{
+    logob64=ev.target.result;
+    setLogoUI(logob64);
+    toast('📸 อัปโหลดโลโก้แล้ว — กด "💾 จำโลโก้" เพื่อให้จดจำ');
+  };r.readAsDataURL(f);e.target.value='';
 }
 function setLogoUI(b64){
   ['logo-img','prev-logo-img'].forEach(id=>{const el=document.getElementById(id);el.src=b64;el.style.display='block';});
   ['logo-ph','prev-logo-ph'].forEach(id=>document.getElementById(id).style.display='none');
-  const lc=document.getElementById('logo-ctrl'); if(lc)lc.style.display='flex';
+  const lc=document.getElementById('logo-ctrl');if(lc)lc.style.display='flex';
 }
 function clearLogo(){
   logob64='';
-  ['logo-img','prev-logo-img'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.src='';}});
+  ['logo-img','prev-logo-img'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.src='';} });
   ['logo-ph','prev-logo-ph'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='block';});
-  const lc=document.getElementById('logo-ctrl'); if(lc)lc.style.display='none';
+  const lc=document.getElementById('logo-ctrl');if(lc)lc.style.display='none';
   document.getElementById('logo-mem').classList.remove('show');
   toast('🗑️ ลบโลโก้แล้ว');
 }
 function saveLogo(){
   if(!logob64){toast('❌ ยังไม่มีโลโก้');return;}
-  try{localStorage.setItem('op8_logo',logob64);document.getElementById('logo-mem').classList.add('show');toast('💾 จำโลโก้แล้ว');}
+  try{localStorage.setItem('op7_logo',logob64);document.getElementById('logo-mem').classList.add('show');toast('💾 จำโลโก้แล้ว');}
   catch(e){toast('❌ ไฟล์ใหญ่เกินไป');}
 }
 function loadLogoFromStorage(){
-  try{const s=localStorage.getItem('op8_logo');if(s){logob64=s;setLogoUI(s);document.getElementById('logo-mem').classList.add('show');}}catch(e){}
+  try{const s=localStorage.getItem('op7_logo');if(s){logob64=s;setLogoUI(s);document.getElementById('logo-mem').classList.add('show');}}catch(e){}
 }
 
 // ════ OFFICER ════
 function onOfficer(e){
-  const f=e.target.files[0]; if(!f)return;
+  const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{
     officerb64=ev.target.result;
@@ -923,12 +1086,15 @@ function clearOfficer(){
 }
 function saveOfficer(){
   if(!officerb64){toast('❌ ยังไม่มีรูปสสอ.');return;}
-  try{localStorage.setItem('op8_officer',officerb64);document.getElementById('officer-mem').classList.add('show');toast('💾 จำรูปสสอ.แล้ว');}
-  catch(e){toast('❌ ไฟล์ใหญ่เกินไป');}
+  try{
+    localStorage.setItem('op7_officer',officerb64);
+    document.getElementById('officer-mem').classList.add('show');
+    toast('💾 จำรูปสสอ.แล้ว — โหลดอัตโนมัติครั้งหน้า');
+  }catch(e){toast('❌ ไฟล์ใหญ่เกินไป ลองบีบอัดรูปก่อน');}
 }
 function loadOfficerFromStorage(){
   try{
-    const s=localStorage.getItem('op8_officer');
+    const s=localStorage.getItem('op7_officer');
     if(s){
       officerb64=s;
       ['officer-img','prev-officer-img'].forEach(id=>{const el=document.getElementById(id);if(el){el.src=s;el.style.display='block';}});
@@ -961,12 +1127,16 @@ function rmFooterLogo(ev,idx){
 function renderFooterLogosPreview(){
   const el=document.getElementById('prev-footer-logos');
   const active=footerLogos.map((b,i)=>b?{b64:b,idx:i}:null).filter(Boolean);
+  // get per-logo sizes
   const getSize=idx=>{const sl=document.getElementById(`flogo-size-${idx}`);return sl?sl.value+'px':'48px';};
   const flPos=document.getElementById('flogo-pos')?.value||'center';
+  // update container justify
   el.style.justifyContent=flPos;
   if(!active.length){
     el.innerHTML='<span class="op-footer-logos-ph">[ โลโก้ท้ายหน้า ]</span>';
-    el.classList.add('empty'); el.style.minHeight='';
+    el.classList.add('empty');
+    // reset min-height
+    el.style.minHeight='';
   }else{
     el.classList.remove('empty');
     const maxH=Math.max(...active.map(a=>parseInt(getSize(a.idx))||48));
@@ -975,68 +1145,39 @@ function renderFooterLogosPreview(){
   }
 }
 
-// ════ TEMPLATE FILL ════
+// ════ FILL TEMPLATE ════
 function fillTpl(){
   const ds=v('f-date')?dfull(v('f-date')):'[วัน เดือน ปีพ.ศ.]';
   const ti=v('f-title')||'[ชื่อกิจกรรม]';const vn=v('f-venue')||'[สถานที่]';
-  const as2=v('f-assignee')||'นายชยานันต์ จันทร์คำ  นักวิชาการสาธารณสุข';
+  const as2=v('f-assignee')||'นายปิยะณัฐ ทองโกย นักวิชาการสาธารณสุขปฏิบัติการ';
   const txt=cType==='A'
     ?`${ds} นางกานพ์ดารัตน์ พลับพลา สาธารณสุขอำเภอเขาค้อ ได้ดำเนินการจัด${ti} อำเภอเขาค้อ จังหวัดเพชรบูรณ์\n\nเพื่อ[ระบุวัตถุประสงค์] โดยมี[ระบุผู้เข้าร่วม] เข้าร่วม ณ ${vn}\n\nผลการดำเนินงาน [ระบุผล]`
     :`${ds} นางกานพ์ดารัตน์ พลับพลา สาธารณสุขอำเภอเขาค้อ มอบหมายให้ ${as2} เจ้าหน้าที่ผู้รับผิดชอบงาน เข้าร่วม${ti} ณ ${vn}\n\nเพื่อ[ระบุวัตถุประสงค์]\n\nผลการดำเนินงาน [ระบุผล]`;
-  document.getElementById('f-body').value=txt;
-  ua();as();updateCC();pushUndo();toast('✨ เติม template แล้ว');
+  document.getElementById('f-body').value=txt;ua();as();updateCC();pushUndo();
+  toast('✨ เติม template แล้ว');
 }
 
-// ════ ★ CLAUDE AI (แทน Gemini) ★ ════
+// ════ AI BODY ════
 async function genAI(){
-  const ti=v('f-title');
-  if(!ti){toast('❌ กรุณาใส่หัวข้อก่อน');return;}
-  const btn=document.getElementById('ai-btn'), spin=document.getElementById('ai-spin');
-  btn.disabled=true; spin.classList.add('show');
-  const ds=v('f-date')?dfull(v('f-date')):'';
-  const vn=v('f-venue');
-  const asgn=cType==='B'&&v('f-assignee')?`ผู้รับมอบหมาย: ${v('f-assignee')}`:
-    'ผู้ดำเนินการ: นางกานพ์ดารัตน์ พลับพลา สาธารณสุขอำเภอเขาค้อ';
-  const promptText=`เขียนข่าวประชาสัมพันธ์สำนักงานสาธารณสุขอำเภอเขาค้อ จังหวัดเพชรบูรณ์
-เรื่อง: ${ti}
-วันที่: ${ds||'ไม่ระบุ'}
-สถานที่: ${vn||'ไม่ระบุ'}
-${asgn}
-
-ข้อกำหนด:
-- เขียนเป็นภาษาราชการที่ถูกต้องและเป็นทางการ
-- แบ่งเป็น 3 ย่อหน้า แยกด้วยบรรทัดว่าง
-- ย่อหน้า 1: บริบทและความสำคัญของกิจกรรม
-- ย่อหน้า 2: รายละเอียดการดำเนินงาน
-- ย่อหน้า 3: ผลที่ได้รับและประโยชน์ต่อประชาชน
-- ไม่ต้องมีหัวข้อ ไม่ต้องมีหมายเลข เขียนต่อเนื่องเป็นร้อยแก้ว
-- ความยาวประมาณ 200-300 คำ`;
-
+  const ti=v('f-title');if(!ti){toast('❌ กรุณาใส่หัวข้อก่อน');return;}
+  const btn=document.getElementById('ai-btn'),spin=document.getElementById('ai-spin');
+  btn.disabled=true;spin.classList.add('show');
+  const ds=v('f-date')?dfull(v('f-date')):'';const vn=v('f-venue');
+  const as2=v('f-assignee')||'นายปิยะณัฐ ทองโกย นักวิชาการสาธารณสุขปฏิบัติการ';
+  const tg=cType==='A'?`แบบ A: "${ds||'วันที่...'} นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ ได้ดำเนินการ..."`:
+    `แบบ B: "${ds||'วันที่...'} นางกานพ์ดารัตน์ พลับพลา สสอ.เขาค้อ มอบหมายให้ ${as2}..."`;
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        messages:[{role:"user",content:promptText}]
-      })
-    });
-    const d=await res.json();
-    if(d.content&&d.content[0]&&d.content[0].text){
-      document.getElementById('f-body').value=d.content[0].text.trim();
-      ua();as();updateCC();pushUndo();
-      toast('✅ Claude เขียนให้เรียบร้อยแล้ว');
-    }else{
-      throw new Error(d.error?.message||'ไม่ได้รับข้อมูลจาก AI');
-    }
-  }catch(e){
-    console.error('AI Error:',e);
-    fillTpl();
-    toast('⚠️ AI ขัดข้อง กำลังใช้ Template แทน');
-  }finally{
-    btn.disabled=false; spin.classList.remove('show');
-  }
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,
+        messages:[{role:'user',content:`เขียนเนื้อหาข่าวประชาสัมพันธ์ สสอ.เขาค้อ จ.เพชรบูรณ์
+กิจกรรม: ${ti}  วันที่: ${ds||'[วันที่]'}  สถานที่: ${vn||'[สถานที่]'}  รูปแบบ: ${tg}
+ต้องการ 3 ย่อหน้า: 1) บอกว่าใคร ทำอะไร ที่ไหน  2) วัตถุประสงค์  3) ผลการดำเนินงาน
+ขึ้นบรรทัดว่างระหว่างย่อหน้า ภาษาราชการไทย ห้ามมีคำอธิบายนำ`}]})});
+    const d=await res.json();const txt=d.content?.[0]?.text||'';
+    if(txt){document.getElementById('f-body').value=txt.trim();ua();as();updateCC();pushUndo();toast('🤖 AI เขียนเสร็จ');}
+    else{fillTpl();toast('⚠️ ใช้ template แทน');}
+  }catch(e){fillTpl();toast('⚠️ ใช้ template แทน');}
+  finally{btn.disabled=false;spin.classList.remove('show');}
 }
 
 // ════ DATE ════
@@ -1044,7 +1185,11 @@ const MF=['','มกราคม','กุมภาพันธ์','มีนา
 const MS=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function dfull(s){if(!s)return'';const[y,m,d]=s.split('-').map(Number);return`วันที่ ${d} ${MF[m]} ${y+543}`;}
 function dshort(s){if(!s)return'';const[y,m,d]=s.split('-').map(Number);return`${d} ${MS[m]} ${y+543}`;}
+
+// ════ CHAR COUNT ════
 function updateCC(){const n=v('f-body').length;const el=document.getElementById('char-ct');el.textContent=n+' ตัวอักษร';el.className='cc'+(n>700?' over':n>500?' warn':'');}
+
+// ════ UNDO ════
 function pushUndo(){if(undoPaused)return;const c=v('f-body');if(undoSt.length&&undoSt[undoSt.length-1]===c)return;undoSt.push(c);if(undoSt.length>30)undoSt.shift();redoSt=[];syncU();}
 function doUndo(){if(undoSt.length<2)return;redoSt.push(undoSt.pop());undoPaused=true;document.getElementById('f-body').value=undoSt[undoSt.length-1]||'';undoPaused=false;ua();updateCC();syncU();}
 function doRedo(){if(!redoSt.length)return;const t=redoSt.pop();undoSt.push(t);undoPaused=true;document.getElementById('f-body').value=t;undoPaused=false;ua();updateCC();syncU();}
@@ -1057,6 +1202,7 @@ function ua(){
   document.getElementById('prev-title').innerHTML=ti||'<span class="op-title-ph">หัวข้อกิจกรรม...</span>';
   const bv=v('f-body').trim();
   if(bv){
+    // split by blank line = paragraph, each gets text-indent via CSS
     const pars=bv.split(/\n\n+/).map(p=>p.replace(/\n/g,'<br>')).filter(Boolean);
     document.getElementById('prev-body').innerHTML=pars.map(p=>`<p>${p}</p>`).join('');
   }else{
@@ -1072,56 +1218,40 @@ function ua(){
   },50);
 }
 
+// ════ ZOOM ════
 function setZoom(z){zoomLv=Math.min(1.3,Math.max(0.25,z));document.getElementById('prev-scale').style.transform=`scale(${zoomLv})`;document.getElementById('zm-pct').textContent=Math.round(zoomLv*100)+'%';}
 function zm(d){d===0?autoZoom():setZoom(zoomLv+d);}
 
-// ════ ★ PHOTOS — with zoom support ★ ════
-// photo object: { b64, name, cp:'center', zoom:1 }
-
+// ════ PHOTOS — use BASE64 for preview (fixes blob URL issue in iframe) ════
 function onFileIn(e){addPh(Array.from(e.target.files));e.target.value='';}
 function oDV(e){e.preventDefault();document.getElementById('dropzone').classList.add('drag-over');}
 function oDL(){document.getElementById('dropzone').classList.remove('drag-over');}
 function oDrop(e){e.preventDefault();oDL();addPh(Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')));}
-
 function addPh(files){
-  const rem=8-photos.length; const add=files.slice(0,rem);
-  if(add.length<files.length) toast('⚠️ รองรับสูงสุด 8 รูป');
-  let p=add.length; if(!p)return;
+  const rem=8-photos.length;const add=files.slice(0,rem);
+  if(add.length<files.length)toast('⚠️ รองรับสูงสุด 8 รูป');
+  let p=add.length;if(!p)return;
   add.forEach(f=>{
     const r=new FileReader();
     r.onload=ev=>{
-      photos.push({b64:ev.target.result,name:f.name,cp:'center',zoom:1});
+      photos.push({b64:ev.target.result,name:f.name,cp:'center'});
       if(--p===0){renderThumbs();setDefLay();renderPhPrev();}
     };r.readAsDataURL(f);
   });
 }
-
-function rmPh(i){
-  photos.splice(i,1);
-  if(cropIdx===i)closeCrop();
-  else if(cropIdx>i)cropIdx--;
-  renderThumbs();setDefLay();renderPhPrev();
-}
+function rmPh(i){photos.splice(i,1);if(cropIdx===i)closeCrop();else if(cropIdx>i)cropIdx--;renderThumbs();setDefLay();renderPhPrev();}
 function clearPhs(){photos=[];cLayout='';cropIdx=null;closeCrop();renderThumbs();renderPhPrev();}
-
-// ★ Build image style string (object-position + transform zoom)
-function imgStyle(p){
-  const zoom=p.zoom||1;
-  const cp=p.cp||'center';
-  return `object-position:${cp};transform:scale(${zoom});transform-origin:${cp}`;
-}
 
 function renderThumbs(){
   const g=document.getElementById('thumbs');const n=photos.length;
   g.style.gridTemplateColumns=n<=1?'1fr':n<=4?'1fr 1fr':'1fr 1fr 1fr';
+  // Use b64 for thumb too
   g.innerHTML=photos.map((p,i)=>`
-    <div class="thumb" draggable="true" ondragstart="dS(${i})" ondragover="dOV2(event,${i})" ondragleave="dLV(${i})" ondrop="dDp(event,${i})" ondragend="dE()">
-      <div class="thumb-img-wrap">
-        <img src="${p.b64}" style="${imgStyle(p)}" loading="lazy">
-      </div>
+    <div class="thumb" draggable="true" ondragstart="dS(${i})" ondragover="dOV(event,${i})" ondragleave="dLV(${i})" ondrop="dDp(event,${i})" ondragend="dE()">
+      <img src="${p.b64}" style="object-position:${p.cp||'center'}" loading="lazy">
       <button class="thumb-rm" onclick="rmPh(${i})">✕</button>
       <div class="thumb-n">${i+1}</div>
-      <button class="thumb-cp" onclick="openCrop(${i})">Crop/Zoom</button>
+      <button class="thumb-cp" onclick="openCrop(${i})">Crop</button>
     </div>`).join('');
   const b=document.getElementById('phn');b.textContent=n;b.className='tbn'+(n>0?' on':'');
   document.getElementById('ph-ct').textContent=n+' รูป';
@@ -1129,92 +1259,32 @@ function renderThumbs(){
   document.getElementById('clear-btn').style.display=n>0?'block':'none';
   renderLayOpts();
 }
-
 function dS(i){dragIdx=i;document.querySelectorAll('.thumb')[i].classList.add('drag-src');}
-function dOV2(e,i){e.preventDefault();document.querySelectorAll('.thumb')[i].classList.add('drop-tgt');}
+function dOV(e,i){e.preventDefault();document.querySelectorAll('.thumb')[i].classList.add('drop-tgt');}
 function dLV(i){document.querySelectorAll('.thumb')[i].classList.remove('drop-tgt');}
 function dE(){document.querySelectorAll('.thumb').forEach(el=>el.classList.remove('drag-src','drop-tgt'));}
-function dDp(e,i){
-  e.preventDefault();
-  if(dragIdx===null||dragIdx===i)return;
-  const m=photos.splice(dragIdx,1)[0];photos.splice(i,0,m);
-  dragIdx=null;renderThumbs();renderPhPrev();toast('↕️ เรียงใหม่แล้ว');
-}
+function dDp(e,i){e.preventDefault();if(dragIdx===null||dragIdx===i)return;const m=photos.splice(dragIdx,1)[0];photos.splice(i,0,m);dragIdx=null;renderThumbs();renderPhPrev();toast('↕️ เรียงใหม่แล้ว');}
+function openCrop(i){cropIdx=i;document.getElementById('crop-num').textContent=i+1;document.getElementById('crop-panel').classList.add('show');const cur=photos[i].cp||'center';document.getElementById('crop-g').innerHTML=CROP_POS.map(c=>`<button class="cpb${c.id===cur?' on':''}" onclick="setCrop('${c.id}')">${c.lb}</button>`).join('');}
+function closeCrop(){cropIdx=null;document.getElementById('crop-panel').classList.remove('show');}
+function setCrop(pos){if(cropIdx===null)return;photos[cropIdx].cp=pos;renderThumbs();renderPhPrev();openCrop(cropIdx);}
 
-// ★ CROP PANEL ★
-function openCrop(i){
-  cropIdx=i;
-  document.getElementById('crop-num').textContent=i+1;
-  document.getElementById('crop-panel').classList.add('show');
-  const p=photos[i];
-  const cur=p.cp||'center';
-  // Position buttons
-  document.getElementById('crop-g').innerHTML=CROP_POS.map(c=>`
-    <button class="cpb${c.id===cur?' on':''}" onclick="setCropPos('${c.id}')">${c.lb}</button>`).join('');
-  // Zoom slider
-  const zoomPct=Math.round((p.zoom||1)*100);
-  document.getElementById('crop-zoom-slider').value=zoomPct;
-  document.getElementById('crop-zoom-val').textContent=(p.zoom||1).toFixed(1)+'×';
-}
-
-function closeCrop(){
-  cropIdx=null;
-  document.getElementById('crop-panel').classList.remove('show');
-}
-
-function setCropPos(pos){
-  if(cropIdx===null)return;
-  photos[cropIdx].cp=pos;
-  renderThumbs();renderPhPrev();
-  // Keep crop panel open, refresh
-  openCrop(cropIdx);
-}
-
-function setCropZoom(val){
-  if(cropIdx===null)return;
-  const z=val/100;
-  photos[cropIdx].zoom=z;
-  document.getElementById('crop-zoom-val').textContent=z.toFixed(1)+'×';
-  renderThumbs();renderPhPrev();
-}
-
-function resetCrop(){
-  if(cropIdx===null)return;
-  photos[cropIdx].cp='center';
-  photos[cropIdx].zoom=1;
-  openCrop(cropIdx);
-  renderThumbs();renderPhPrev();
-  toast('🔄 รีเซ็ต Crop แล้ว');
-}
-
-// Layout options
 const LAYS={1:[{id:'pg-1',l:'เต็ม'}],2:[{id:'pg-2',l:'2คอล'},{id:'pg-2h',l:'2แถว'}],3:[{id:'pg-3',l:'1ใหญ่+2'},{id:'pg-6',l:'3เท่า'}],4:[{id:'pg-4',l:'2×2'},{id:'pg-4b',l:'4แถว'}],5:[{id:'pg-5',l:'1ใหญ่+4'},{id:'pg-6',l:'3+2'}],6:[{id:'pg-6',l:'3×2'},{id:'pg-6b',l:'2×3'}],7:[{id:'pg-7',l:'3+4'}],8:[{id:'pg-8',l:'4×2'},{id:'pg-8b',l:'2×4'}]};
 const LNAMES={'pg-1':'1เต็ม','pg-2':'2คอล','pg-2h':'2แถว','pg-3':'1ใหญ่+2','pg-4':'2×2','pg-4b':'4แถว','pg-5':'1ใหญ่+4','pg-6':'3×2','pg-6b':'2×3','pg-7':'3+4','pg-8':'4×2','pg-8b':'2×4'};
 const LSLOTS={'pg-1':1,'pg-2':2,'pg-2h':2,'pg-3':3,'pg-4':4,'pg-4b':4,'pg-5':5,'pg-6':6,'pg-6b':6,'pg-7':7,'pg-8':8,'pg-8b':8};
 function setDefLay(){const n=photos.length;if(!n){cLayout='';renderLayOpts();return;}const opts=LAYS[n]||LAYS[8];if(!cLayout||!opts.find(o=>o.id===cLayout))cLayout=opts[0]?.id||'';renderLayOpts();}
-function renderLayOpts(){
-  const n=photos.length;const w=document.getElementById('lay-wrap');const g=document.getElementById('lay-opts');const lbl=document.getElementById('lay-lbl');
-  if(!n){w.style.display='none';lbl.textContent='—';return;}
-  const opts=LAYS[n]||[];
-  w.style.display=opts.length>1?'':'none';
-  g.innerHTML=opts.map(o=>`<div class="lo${o.id===cLayout?' on':''}" onclick="pickLay('${o.id}')">${o.l}</div>`).join('');
-  lbl.textContent='Layout: '+(LNAMES[cLayout]||'');
-}
+function renderLayOpts(){const n=photos.length;const w=document.getElementById('lay-wrap');const g=document.getElementById('lay-opts');const lbl=document.getElementById('lay-lbl');if(!n){w.style.display='none';lbl.textContent='—';return;}const opts=LAYS[n]||[];w.style.display=opts.length>1?'':'none';g.innerHTML=opts.map(o=>`<div class="lo${o.id===cLayout?' on':''}" onclick="pickLay('${o.id}')">${o.l}</div>`).join('');lbl.textContent='Layout: '+(LNAMES[cLayout]||'');}
 function pickLay(id){cLayout=id;renderLayOpts();renderPhPrev();}
 
-// ★ Render photos with zoom applied as inline transform ★
+// ★ KEY FIX: use p.b64 (not blob URL) so preview works in iframe sandbox ★
 function renderPhPrev(){
   const el=document.getElementById('prev-photos');
   if(!photos.length){el.innerHTML='<div class="op-photos-empty">📷 รูปกิจกรรมจะปรากฏที่นี่</div>';ua();return;}
   const cls=cLayout||'pg-'+Math.min(photos.length,8);
   const slots=LSLOTS[cls]||photos.length;
   let html=`<div class="photo-grid ${cls}">`;
-  photos.forEach((p,i)=>{
-    html+=`<div class="pi"><img src="${p.b64}" style="${imgStyle(p)}" loading="lazy"></div>`;
-  });
-  for(let i=photos.length;i<slots;i++) html+=`<div class="pi"><div class="pi-ph">📷<br><span style="font-size:8px">รูป ${i+1}</span></div></div>`;
-  html+='</div>';
-  el.innerHTML=html;ua();
+  photos.forEach((p,i)=>{html+=`<div class="pi"><img src="${p.b64}" style="object-position:${p.cp||'center'}" loading="lazy"></div>`;});
+  for(let i=photos.length;i<slots;i++)html+=`<div class="pi"><div class="pi-ph">📷<br><span style="font-size:8px">รูป ${i+1}</span></div></div>`;
+  html+='</div>';el.innerHTML=html;ua();
 }
 
 // ════ AUTO SAVE ════
@@ -1222,13 +1292,13 @@ function as(){
   clearTimeout(saveTimer);
   document.getElementById('save-ind').innerHTML='<div class="sdot" style="background:#ff9800"></div><span>กำลังบันทึก...</span>';
   saveTimer=setTimeout(()=>{
-    try{localStorage.setItem('op8_d',JSON.stringify({type:cType,date:v('f-date'),title:v('f-title'),body:v('f-body'),assignee:v('f-assignee'),venue:v('f-venue'),theme:cTheme}));}catch(e){}
+    try{localStorage.setItem('op7_d',JSON.stringify({type:cType,date:v('f-date'),title:v('f-title'),body:v('f-body'),assignee:v('f-assignee'),venue:v('f-venue'),theme:cTheme}));}catch(e){}
     document.getElementById('save-ind').innerHTML='<div class="sdot"></div><span>บันทึกแล้ว</span>';
   },700);
 }
 function loadData(){
   try{
-    const d=JSON.parse(localStorage.getItem('op8_d')||'{}');
+    const d=JSON.parse(localStorage.getItem('op7_d')||'{}');
     setType(d.type||'A');
     ['date','title','body','assignee','venue'].forEach(k=>{const el=document.getElementById('f-'+k);if(el&&d[k])el.value=d[k];});
     if(d.theme)cTheme=d.theme;
@@ -1237,8 +1307,8 @@ function loadData(){
 }
 
 // ════ DRAFTS ════
-function getSlots(){try{return JSON.parse(localStorage.getItem('op8_slots')||'[]');}catch(e){return[];}}
-function saveSlotData(sl){try{localStorage.setItem('op8_slots',JSON.stringify(sl));}catch(e){}}
+function getSlots(){try{return JSON.parse(localStorage.getItem('op7_slots')||'[]');}catch(e){return[];}}
+function saveSlotData(sl){try{localStorage.setItem('op7_slots',JSON.stringify(sl));}catch(e){}}
 function renderSlots(){
   const sl=getSlots();
   document.getElementById('slots').innerHTML=[0,1,2].map(i=>{
@@ -1247,19 +1317,8 @@ function renderSlots(){
     return`<div class="slot"><div class="slot-top"><div class="slot-nm">ร่างที่ ${i+1}</div><button class="slb sv" onclick="saveSlot(${i})">💾 บันทึก</button></div><div style="font-size:10px;color:#aaa;font-style:italic">— ว่างอยู่ —</div></div>`;
   }).join('');
 }
-function saveSlot(i){
-  const sl=getSlots();const now=new Date();
-  const ts=`${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()+543} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-  sl[i]={type:cType,date:v('f-date'),title:v('f-title'),body:v('f-body'),assignee:v('f-assignee'),venue:v('f-venue'),savedAt:ts,theme:cTheme};
-  saveSlotData(sl);renderSlots();toast(`✅ บันทึกร่าง ${i+1}`);
-}
-function loadSlot(i){
-  const sl=getSlots();const s=sl[i];if(!s)return;
-  setType(s.type||'A');
-  ['date','title','body','assignee','venue'].forEach(k=>{const el=document.getElementById('f-'+k);if(el&&s[k])el.value=s[k];});
-  if(s.theme){cTheme=s.theme;applyTheme(s.theme);}
-  ua();updateCC();as();toast(`📂 โหลดร่าง ${i+1}`);
-}
+function saveSlot(i){const sl=getSlots();const now=new Date();const ts=`${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()+543} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;sl[i]={type:cType,date:v('f-date'),title:v('f-title'),body:v('f-body'),assignee:v('f-assignee'),venue:v('f-venue'),savedAt:ts,theme:cTheme};saveSlotData(sl);renderSlots();toast(`✅ บันทึกร่าง ${i+1}`);}
+function loadSlot(i){const sl=getSlots();const s=sl[i];if(!s)return;setType(s.type||'A');['date','title','body','assignee','venue'].forEach(k=>{const el=document.getElementById('f-'+k);if(el&&s[k])el.value=s[k];});if(s.theme){cTheme=s.theme;applyTheme(s.theme);}ua();updateCC();as();toast(`📂 โหลดร่าง ${i+1}`);}
 function delSlot(i){const sl=getSlots();delete sl[i];saveSlotData(sl);renderSlots();toast(`🗑️ ลบร่าง ${i+1}`);}
 
 // ════ STATUS ════
@@ -1270,36 +1329,35 @@ function renderStatus(){
     {l:'โลโก้',v:logob64,req:false},{l:'รูปผู้บริหาร',v:officerb64,req:false},
     {l:'Logo ท้ายหน้า',v:footerLogos.some(Boolean)?'1':'',req:false},
   ];
-  document.getElementById('status-list').innerHTML=checks.map(c=>{
-    const ok=c.v&&c.v.length>0;
-    return`<div class="st-row"><div class="stdt ${ok?'ok':c.req?'bad':'warn'}"></div>${ok?'✅':c.req?'❌':'⚪'} ${c.l}${!c.req?' (ตัวเลือก)':''}</div>`;
-  }).join('');
+  document.getElementById('status-list').innerHTML=checks.map(c=>{const ok=c.v&&c.v.length>0;return`<div class="st-row"><div class="stdt ${ok?'ok':c.req?'bad':'warn'}"></div>${ok?'✅':c.req?'❌':'⚪'} ${c.l}${!c.req?' (ตัวเลือก)':''}</div>`;}).join('');
 }
 
+// ════ GET CURRENT THEME OBJECT ════
 function getCurTheme(){let t=TF[0].t[0];TF.forEach(f=>{f.t.forEach(th=>{if(th.id===cTheme)t=th;});});return t;}
 
-// ════ ★ BUILD PRINT HTML (Fixed: officer row layout + zoom) ★ ════
+// ════ GENERATE PRINT HTML ════
 function buildPrintHTML(){
   const t=getCurTheme();
+  // get sizes from sliders
   const gS=k=>{const el=document.getElementById(k);return el?el.value:'';};
   const pct=Number(gS('ph-scale'))/100||1;
   const mg=gS('ph-mg')||'0';
   const flPos=document.getElementById('flogo-pos')?.value||'center';
+  const flSize=gS('flogo-size')||'48';
 
-  // photos with zoom
+  // photos
   let phHtml='<div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#bbb;background:#f5f5f5">ไม่มีรูปภาพ</div>';
   if(photos.length>0){
     const cls=cLayout||'pg-'+Math.min(photos.length,8);
     phHtml=`<div class="photo-grid ${cls}">`;
-    photos.forEach((p,i)=>{
-      const zoom=p.zoom||1;const cp=p.cp||'center';
-      phHtml+=`<div class="pi"><img src="${p.b64}" style="object-position:${cp};transform:scale(${zoom});transform-origin:${cp}" alt="${i+1}"></div>`;
-    });
+    photos.forEach((p,i)=>{phHtml+=`<div class="pi"><img src="${p.b64}" style="object-position:${p.cp||'center'}" alt="${i+1}"></div>`;});
     phHtml+='</div>';
   }
 
+  // body paragraphs
   const bPars=v('f-body').trim().split(/\n\n+/).map(p=>p.replace(/\n/g,'<br>')).filter(Boolean);
 
+  // footer logos
   const getFlSize=idx=>{const el=document.getElementById(`flogo-size-${idx}`);return el?el.value+'px':'48px';};
   const activeFLogos=footerLogos.map((b,i)=>b?{b64:b,idx:i}:null).filter(Boolean);
   const flogosHtml=activeFLogos.length
@@ -1307,7 +1365,7 @@ function buildPrintHTML(){
     :'';
 
   const logoEl=logob64?`<img style="width:100%;height:100%;object-fit:contain;display:block" src="${logob64}">`:`<span style="font-size:40px;color:#ccc">🏛️</span>`;
-  const offEl=officerb64?`<img style="height:112px;width:auto;max-width:92px;object-fit:contain;display:block" src="${officerb64}">`:`<span style="font-size:44px;color:#ccc">👤</span>`;
+  const offEl=officerb64?`<img style="height:90px;width:auto;object-fit:contain;display:block;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.22))" src="${officerb64}">`:`<span style="font-size:44px;color:#ccc">👤</span>`;
 
   return `<!DOCTYPE html><html lang="th"><head>
 <meta charset="UTF-8"><title>One-Page สสอ.เขาค้อ — ${v('f-title')}</title>
@@ -1316,13 +1374,7 @@ function buildPrintHTML(){
 :root{--c1:${t.c1};--c2:${t.c2};--c3:${t.c3};--c4:${t.c4};--c5:${t.c5};--gold:${t.g}}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#e8eceb;display:flex;justify-content:center;padding:0;margin:0;font-family:'Sarabun',sans-serif}
-.onepage{
-  width:794px;min-height:1123px;background:white;display:flex;flex-direction:column;
-  --fs-badge:${gS('fs-badge')||20}px;--fs-org:${gS('fs-org')||14}px;--fs-name:${gS('fs-name')||14}px;
-  --fs-date:${gS('fs-date')||13}px;--fs-title:${gS('fs-title')||24}px;--fs-label:${gS('fs-label')||12}px;
-  --fs-body:${gS('fs-body')||13}px;--fs-footer:${gS('fs-footer')||12}px;
-  --line-body:${(Number(gS('line-h')||190)/100).toFixed(2)}
-}
+.onepage{width:794px;min-height:1123px;background:white;display:flex;flex-direction:column;--fs-badge:${gS('fs-badge')||20}px;--fs-org:${gS('fs-org')||14}px;--fs-name:${gS('fs-name')||14}px;--fs-date:${gS('fs-date')||13}px;--fs-title:${gS('fs-title')||24}px;--fs-label:${gS('fs-label')||12}px;--fs-body:${gS('fs-body')||13}px;--fs-footer:${gS('fs-footer')||12}px;--line-body:${(Number(gS('line-h')||190)/100).toFixed(2)}}
 .op-st{height:8px;background:linear-gradient(90deg,var(--c1),var(--c3) 60%,var(--gold));flex-shrink:0}
 .op-hdr{flex-shrink:0;height:140px;background:white;border-bottom:3px solid var(--c1);display:flex;align-items:stretch;padding:10px 20px;gap:12px}
 .op-hl{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
@@ -1330,13 +1382,12 @@ body{background:#e8eceb;display:flex;justify-content:center;padding:0;margin:0;f
 .op-badge{display:inline-block;background:var(--c1);color:white;font-family:'Prompt',sans-serif;font-size:var(--fs-badge);font-weight:800;padding:4px 16px;border-radius:4px;margin-bottom:5px;line-height:1.3}
 .op-org{font-size:var(--fs-org);font-weight:600;color:#3D3D3D;line-height:1.4}
 .op-unit{font-size:calc(var(--fs-org)*0.88);color:#777}
-/* ★ FIX: always ROW — matches live preview ★ */
-.op-hr{display:flex;flex-direction:row;align-items:flex-end;flex-shrink:0;gap:11px;padding-bottom:6px}
-.op-officer{flex-shrink:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;height:112px}
-.op-off-info{text-align:right}
-.op-off-name{font-size:var(--fs-name);font-weight:800;color:var(--c1);line-height:1.3;white-space:nowrap}
-.op-off-pos{font-size:12px;color:#555;font-weight:500;margin-bottom:3px;white-space:nowrap}
+.op-hr{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex-shrink:0;gap:5px;padding-bottom:4px}
+.op-officer{height:90px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center}
+.op-off-name{font-size:var(--fs-name);font-weight:800;color:var(--c1);line-height:1.3;text-align:center}
+.op-off-pos{font-size:var(--fs-pos,12px);color:#555;font-weight:500;margin-bottom:3px;text-align:center}
 .op-date-chip{display:inline-block;background:var(--c1);color:white;font-size:var(--fs-date);font-weight:700;padding:3px 12px;border-radius:4px}
+.op-off-info{text-align:center}
 .op-title-band{flex-shrink:0;min-height:58px;background:linear-gradient(135deg,var(--c5),#f8fef9);border-bottom:2px solid var(--c4);padding:11px 20px;display:flex;align-items:center;justify-content:center}
 .op-title{font-family:'Prompt',sans-serif;font-size:var(--fs-title);font-weight:800;color:var(--c1);line-height:1.3;text-align:center}
 .op-photos{flex-shrink:0;overflow:hidden;width:100%;padding:0 ${mg}px}
@@ -1354,21 +1405,41 @@ body{background:#e8eceb;display:flex;justify-content:center;padding:0;margin:0;f
 .pg-7{grid-template-columns:repeat(3,1fr)}.pg-7 .pi{height:calc(${pct}*142px)}
 .pg-8{grid-template-columns:repeat(4,1fr)}.pg-8 .pi{height:calc(${pct}*135px)}
 .pg-8b{grid-template-columns:1fr 1fr}.pg-8b .pi{height:calc(${pct}*135px)}
-/* ★ FIX: object-fit:cover ไม่ยืดรูป + zoom via transform ★ */
-.pi{overflow:hidden;background:#c0d8c8}
-.pi img{width:100%;height:100%;object-fit:cover;display:block}
+.pi{overflow:hidden;background:#c0d8c8}.pi img{width:100%;height:100%;object-fit:cover;display:block}
 .op-body-sec{flex:1;padding:10px 20px 8px}
+.op-sec{margin-bottom:8px}
 .op-sec-lbl{font-size:var(--fs-label);font-weight:800;color:var(--c1);letter-spacing:0.5px;text-transform:uppercase;display:flex;align-items:center;gap:5px;margin-bottom:5px}
 .op-sec-lbl::before{content:'';width:3px;height:13px;background:var(--c1);border-radius:2px;flex-shrink:0}
 .op-sec-lbl::after{content:'';flex:1;height:1px;background:var(--c4)}
 .op-txt{font-size:var(--fs-body);line-height:var(--line-body);color:#3D3D3D;text-align:justify}
 .op-txt p{text-indent:2em;margin-bottom:5px;word-break:break-word}
 .op-txt p:last-child{margin-bottom:0}
-.op-footer-logos{flex-shrink:0;padding:7px 20px;display:flex;align-items:center;justify-content:${flPos};gap:12px;background:white;border-top:1px solid var(--c4)}
+.op-footer-logos{flex-shrink:0;padding:7px 20px;min-height:calc(${flSize}px + 14px);display:flex;align-items:center;justify-content:${flPos};gap:12px;background:white;border-top:1px solid var(--c4)}
 .op-footer{flex-shrink:0;height:40px;background:var(--c1);padding:0 20px;display:flex;align-items:center;justify-content:space-between}
 .op-fp{font-size:var(--fs-footer);color:white;font-weight:700}
 .op-fo{font-size:calc(var(--fs-footer)*0.88);color:rgba(255,255,255,0.75)}
 .op-sb{flex-shrink:0;height:5px;background:linear-gradient(90deg,var(--gold),var(--c3),var(--c1))}
+
+/* ═══ MOBILE TOUCH FIXES ═══ */
+button, [onclick], .tyb, .thm, .lo, .thumb, .flogo-slot, .dropzone,
+.slb, .fill-btn, .ai-btn, .exp-btn, .exp-opt-btn, .ubtn, .cpb {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer !important;
+}
+/* Min tap target 44px for accessibility on mobile */
+.tab { min-height: 44px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.btn { min-height: 36px; }
+.slb, .ubtn { min-height: 32px; }
+/* Fix iOS rubber-band scroll */
+.app { position: fixed; width: 100%; }
+/* Make select usable on mobile */
+select { font-size: 16px !important; touch-action: manipulation; }
+/* Prevent zoom on focus iOS */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select, textarea, input { font-size: 16px !important; }
+}
+
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   body{background:white;padding:0;margin:0}
@@ -1377,18 +1448,14 @@ body{background:#e8eceb;display:flex;justify-content:center;padding:0;margin:0;f
 }
 </style></head>
 <body>
+<script>window.onload=function(){setTimeout(function(){window.print();},600);};<\/script>
 <div class="onepage">
   <div class="op-st"></div>
   <div class="op-hdr">
     <div class="op-hl">
       <div class="op-logo">${logoEl}</div>
-      <div>
-        <div class="op-badge">ข่าวประชาสัมพันธ์</div>
-        <div class="op-org">สำนักงานสาธารณสุขอำเภอเขาค้อ</div>
-        <div class="op-unit">จังหวัดเพชรบูรณ์</div>
-      </div>
+      <div><div class="op-badge">ข่าวประชาสัมพันธ์</div><div class="op-org">สำนักงานสาธารณสุขอำเภอเขาค้อ</div><div class="op-unit">จังหวัดเพชรบูรณ์</div></div>
     </div>
-    <!-- ★ Row layout = matches preview ★ -->
     <div class="op-hr">
       <div class="op-officer">${offEl}</div>
       <div class="op-off-info">
@@ -1407,16 +1474,13 @@ body{background:#e8eceb;display:flex;justify-content:center;padding:0;margin:0;f
     </div>
   </div>
   ${flogosHtml?`<div class="op-footer-logos">${flogosHtml}</div>`:''}
-  <div class="op-footer">
-    <div class="op-fp">📞 056-728080</div>
-    <div class="op-fo">สำนักงานสาธารณสุขอำเภอเขาค้อ</div>
-  </div>
+  <div class="op-footer"><div class="op-fp">📞 056-728080</div><div class="op-fo">สำนักงานสาธารณสุขอำเภอเขาค้อ</div></div>
   <div class="op-sb"></div>
 </div>
 </body></html>`;
 }
 
-// ════ EXPORT ════
+// ════ EXPORT MODAL ════
 function openExportModal(){
   if(!v('f-title')&&!v('f-body')){toast('❌ กรอกข้อมูลก่อน Export');return;}
   document.getElementById('export-modal').classList.add('show');
@@ -1425,35 +1489,38 @@ function openExportModal(){
 }
 function closeExportModal(){document.getElementById('export-modal').classList.remove('show');}
 
-// ★ Capture: ลบ transform ชั่วคราวก่อน capture ★
+// ════ CAPTURE ONEPAGE TO CANVAS (shared by all export types) ════
 async function captureOnepage(){
   const el=document.getElementById('onepage');
-  const scaleEl=document.getElementById('prev-scale');
-  const prevT=scaleEl.style.transform;
-  scaleEl.style.transform='none';
-  // Wait a frame for layout to settle
-  await new Promise(r=>requestAnimationFrame(r));
-  await new Promise(r=>setTimeout(r,100));
+  // Temporarily ensure full size for capture
+  const prevTransform=el.parentElement.style.transform;
+  el.parentElement.style.transform='none';
   const canvas=await html2canvas(el,{
     scale:2,useCORS:true,allowTaint:true,
-    backgroundColor:'#ffffff',logging:false,
+    backgroundColor:'#ffffff',
+    logging:false,
     width:794,height:1123,
     windowWidth:794,windowHeight:1123,
-    ignoreElements:el=>{
-      // Ignore UI overlays
-      return el.classList&&(el.classList.contains('topbar')||el.classList.contains('panel-l')||el.classList.contains('prev-row'));
-    }
   });
-  scaleEl.style.transform=prevT;
+  el.parentElement.style.transform=prevTransform;
   return canvas;
 }
 
+// ════ EXPORT DISPATCHER ════
 async function doExport(type){
   const prog=document.getElementById('export-progress');
   const btns=document.getElementById('export-btns');
   const fname=`onepage-สสอ-เขาค้อ-${v('f-date')||new Date().toISOString().split('T')[0]}`;
-  if(type==='html'){closeExportModal();saveHTML();return;}
-  btns.style.display='none';prog.style.display='block';
+
+  if(type==='html'){
+    closeExportModal();
+    saveHTML();
+    return;
+  }
+
+  btns.style.display='none';
+  prog.style.display='block';
+
   try{
     if(type==='print'){
       prog.innerHTML='<span class="spin" style="display:inline-block;margin-right:6px">⚙️</span>กำลังเตรียมหน้าพิมพ์...';
@@ -1461,71 +1528,139 @@ async function doExport(type){
       const imgData=canvas.toDataURL('image/png');
       const iframe=document.getElementById('print-frame');
       iframe.srcdoc=`<!DOCTYPE html><html><head>
-        <style>*{margin:0;padding:0;box-sizing:border-box}body{width:210mm;height:297mm;background:white}img{width:210mm;height:297mm;object-fit:contain;display:block}@page{margin:0;size:A4 portrait}@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}</style>
+        <style>*{margin:0;padding:0;box-sizing:border-box}body{width:210mm;height:297mm;background:white}img{width:210mm;height:297mm;object-fit:contain;display:block}@page{margin:0;size:A4 portrait}
+/* ═══ MOBILE TOUCH FIXES ═══ */
+button, [onclick], .tyb, .thm, .lo, .thumb, .flogo-slot, .dropzone,
+.slb, .fill-btn, .ai-btn, .exp-btn, .exp-opt-btn, .ubtn, .cpb {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  cursor: pointer !important;
+}
+/* Min tap target 44px for accessibility on mobile */
+.tab { min-height: 44px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.btn { min-height: 36px; }
+.slb, .ubtn { min-height: 32px; }
+/* Fix iOS rubber-band scroll */
+.app { position: fixed; width: 100%; }
+/* Make select usable on mobile */
+select { font-size: 16px !important; touch-action: manipulation; }
+/* Prevent zoom on focus iOS */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select, textarea, input { font-size: 16px !important; }
+}
+
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}</style>
       </head><body><img src="${imgData}"></body></html>`;
       iframe.onload=()=>{
-        try{iframe.contentWindow.focus();iframe.contentWindow.print();}catch(e){window.print();}
-        closeExportModal();toast('🖨️ เปิด Print dialog แล้ว');
-      };return;
+        try{iframe.contentWindow.focus();iframe.contentWindow.print();}
+        catch(e){window.print();}
+        closeExportModal();
+        toast('🖨️ เปิด Print dialog แล้ว');
+      };
+      return;
     }
+
+    // PNG / JPG / PDF → ถ่ายภาพก่อน
     prog.innerHTML='<span class="spin" style="display:inline-block;margin-right:6px">⚙️</span>กำลังสร้างไฟล์...';
     const canvas=await captureOnepage();
+
     if(type==='pdf'){
+      // jsPDF save — may work depending on environment
       const imgData=canvas.toDataURL('image/jpeg',0.97);
       try{
         const {jsPDF}=window.jspdf;
         const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
         pdf.addImage(imgData,'JPEG',0,0,210,297,undefined,'FAST');
         pdf.save(`${fname}.pdf`);
-        closeExportModal();toast('✅ บันทึก PDF แล้ว');
-      }catch(e){closeExportModal();showResultViewer(imgData,'pdf',fname+'.pdf');}
-    }else{
+        closeExportModal();
+        toast('✅ บันทึก PDF แล้ว — ดูในโฟลเดอร์ Downloads');
+      }catch(e){
+        // PDF save failed — show image result so user can save manually
+        closeExportModal();
+        showResultViewer(imgData,'pdf',fname+'.pdf');
+      }
+    }
+    else{
+      // PNG / JPG
       const mime=type==='jpg'?'image/jpeg':'image/png';
       const q=type==='jpg'?0.95:1;
       const dataUrl=canvas.toDataURL(mime,q);
       const ext=type==='jpg'?'jpg':'png';
+
+      // Try auto-download first
       let downloaded=false;
       try{
-        const link=document.createElement('a');link.href=dataUrl;link.download=`${fname}.${ext}`;
-        link.style.display='none';document.body.appendChild(link);link.click();document.body.removeChild(link);
+        const link=document.createElement('a');
+        link.href=dataUrl;
+        link.download=`${fname}.${ext}`;
+        link.style.display='none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         downloaded=true;
       }catch(e){}
+
       closeExportModal();
-      showResultViewer(dataUrl,ext,`${fname}.${ext}`,downloaded);
+      // Always show viewer so user can save if download was blocked
+      showResultViewer(dataUrl, ext, `${fname}.${ext}`, downloaded);
     }
   }catch(err){
-    console.error(err);closeExportModal();
-    toast('❌ เกิดข้อผิดพลาด: '+err.message);
-    document.getElementById('export-progress').style.display='none';
-    document.getElementById('export-btns').style.display='flex';
+    console.error(err);
+    closeExportModal();
+    toast('❌ เกิดข้อผิดพลาด — ลองใหม่: '+err.message);
+    // Reset progress UI
+    const prog2=document.getElementById('export-progress');
+    const btns2=document.getElementById('export-btns');
+    if(prog2)prog2.style.display='none';
+    if(btns2)btns2.style.display='flex';
   }
 }
 
-function showResultViewer(dataUrl,type,filename,autoDownloaded){
+// ════ RESULT VIEWER — แสดงรูปให้กดบันทึก ════
+function showResultViewer(dataUrl, type, filename, autoDownloaded){
   const rv=document.getElementById('result-viewer');
-  document.getElementById('result-img').src=dataUrl;
-  document.getElementById('result-type-badge').textContent=type.toUpperCase();
-  document.getElementById('result-filename').textContent=filename;
-  document.getElementById('result-dl-btn').onclick=()=>{
-    const a=document.createElement('a');a.href=dataUrl;a.download=filename;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);toast('⬇️ กำลัง Download...');
+  const rvi=document.getElementById('result-img');
+  const rvt=document.getElementById('result-type-badge');
+  const rvfn=document.getElementById('result-filename');
+  const rvdl=document.getElementById('result-dl-btn');
+  const rvhint=document.getElementById('result-hint');
+
+  rvi.src=dataUrl;
+  rvt.textContent=type.toUpperCase();
+  rvfn.textContent=filename;
+
+  // Download button
+  rvdl.onclick=()=>{
+    const a=document.createElement('a');
+    a.href=dataUrl;a.download=filename;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast('⬇️ กำลัง Download...');
   };
-  document.getElementById('result-hint').innerHTML=autoDownloaded
-    ?'✅ <strong>ดาวน์โหลดอัตโนมัติแล้ว</strong> — ตรวจสอบโฟลเดอร์ Downloads<br><small style="color:#888">หรือกดปุ่ม Download / กดค้างที่รูปเพื่อบันทึก</small>'
-    :'⬇️ <strong>วิธีบันทึก:</strong> PC/Mac — คลิกปุ่ม Download หรือคลิกขวาที่รูป → บันทึก | Mobile — กดค้างที่รูป → Save Image';
-  rv.style.display='flex';
+
+  if(autoDownloaded){
+    rvhint.innerHTML='✅ <strong>ดาวน์โหลดอัตโนมัติแล้ว</strong> — ตรวจสอบโฟลเดอร์ Downloads ของเครื่อง<br><small style="color:#888">หรือกดปุ่ม Download อีกครั้ง / กดค้างที่รูปเพื่อบันทึก</small>';
+  }else{
+    rvhint.innerHTML='⬇️ <strong>วิธีบันทึกรูป:</strong><br>• <b>PC/Mac:</b> คลิกปุ่ม Download ด้านล่าง หรือ คลิกขวาที่รูป → "บันทึกรูปภาพ"<br>• <b>Mobile:</b> กดค้างที่รูป → "บันทึกรูปภาพ / Save Image"';
+  }
+
+  rv.classList.add('show');
 }
 
+// kept for legacy calls from export tab
+function openPrintWindow(){openExportModal();}
+
+// ════ SAVE HTML ════
 function saveHTML(){
   toast('💾 กำลังเตรียม...');
-  const html=buildPrintHTML();
+  const html=buildPrintHTML().replace('<script>window.onload=function(){setTimeout(function(){window.print();},600);};<\/script>','');
   const a=document.createElement('a');
   a.href='data:text/html;charset=utf-8,'+encodeURIComponent(html);
   a.download=`onepage-สสอ-เขาค้อ-${v('f-date')||new Date().toISOString().split('T')[0]}.html`;
   a.click();toast('✅ บันทึกไฟล์เสร็จ');
 }
+
 function openCanva(){window.open('https://www.canva.com/d/yQ1fruHwwug5qTx','_blank');}
-function copyTxt(){const txt=v('f-body');if(!txt){toast('❌ ยังไม่มีข้อมูล');return;}navigator.clipboard.writeText(txt).then(()=>toast('✅ คัดลอกแล้ว'));}
+function copyTxt(w){const txt=v('f-body');if(!txt){toast('❌ ยังไม่มีข้อมูล');return;}navigator.clipboard.writeText(txt).then(()=>toast('✅ คัดลอกแล้ว'));}
 
 // ════ MODAL ════
 let pendFn=null;
@@ -1540,7 +1675,7 @@ function closeMod(){document.getElementById('modal').classList.remove('show');}
 function doReset(){
   ['date','title','body','assignee','venue'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});
   clearPhs();clearOfficer();setType('A');undoSt=[];redoSt=[];syncU();ua();updateCC();
-  try{localStorage.removeItem('op8_d');}catch(e){}
+  try{localStorage.removeItem('op7_d');}catch(e){}
   toast('🔄 ล้างข้อมูลแล้ว');
 }
 
